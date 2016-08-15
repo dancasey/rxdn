@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2015",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "outDir": "dist",
+    "declaration": true,
+    "strictNullChecks": true
+  },
+  "files": [
+    "src/rxdn.ts",
+    "src/test.ts",
+    "src/debug.ts"
+  ]
+}
