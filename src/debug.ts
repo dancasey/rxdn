@@ -6,16 +6,16 @@ import * as rxdn from "./rxdn";
 import {Observable} from "rxjs";
 
 interface Sources extends rxdn.ObservableCollection {
-  console: Observable<string>;
-  switchDriver: Observable<rxdn.MessageStream>;
+  switchDriver: rxdn.switchSource;
 }
 
 const main: rxdn.MainFn = (sources: Sources) => {
-  const sink = sources.switchDriver
-    .map(val => `Received a ${val.message.name}`);
-  return {
-    console: sink,
-  };
+  const [messages, errors] = <[Observable<rxdn.MessageStream>, Observable<rxdn.ErrorStream>]> sources.switchDriver
+    .partition(x => "message" in x);
+  const messageConsole = messages.map(m => `${m.message.name}\t${m.socket.address}`);
+  const errorConsole = errors.map(e => `Error at ${e.function}\t${e.error}`);
+  const console = messageConsole.merge(errorConsole);
+  return {console};
 };
 
 const drivers: rxdn.Drivers = {
