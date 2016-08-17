@@ -8,9 +8,7 @@
     "declaration": true,
     "strictNullChecks": true
   },
-  "files": [
-    "src/rxdn.ts",
-    "src/test.ts",
-    "src/debug.ts"
+  "include": [
+    "src/**/*.ts"
   ]
 }

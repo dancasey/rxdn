@@ -1,5 +1,5 @@
 /**
- * Used to run one-off tests, rather than `test.ts` which
+ * Used to run one-off tests, rather than the `test` directory which
  * is a suite of tests that run automatically with `npm test`
  */
 import * as rxdn from "./rxdn";

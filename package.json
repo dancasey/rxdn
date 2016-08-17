@@ -29,7 +29,7 @@
   ],
   "ava": {
     "files": [
-      "dist/test.js"
+      "dist/test/*.js"
     ],
     "verbose": true
   },

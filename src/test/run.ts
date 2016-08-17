@@ -1,7 +1,7 @@
 /* run tests with `npm test` */
 /* tslint:disable:no-string-literals */
 import test from "ava";
-import * as rxdn from "./rxdn";
+import * as rxdn from "../rxdn";
 import {Subscription, Observable} from "rxjs";
 
 const testString = "test 1 2 3";
