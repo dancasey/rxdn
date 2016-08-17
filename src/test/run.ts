@@ -13,12 +13,12 @@ interface TestSources extends rxdn.ObservableCollection {
   testDriver: Observable<string>;
 }
 
-test("run returns a subscription", t => {
+test("returns a subscription", t => {
   t.truthy(rxdn.run(identityMain, {testDriver}) instanceof Subscription);
 });
 
 // uses identity main and injects from driver
-test("run connects drivers to main", t => {
+test("connects drivers to main", t => {
   // make a fake driver that checks for the string it injects
   const d: rxdn.Driver<string, string> = (sink) => {
     if (!sink) {
@@ -34,7 +34,7 @@ test("run connects drivers to main", t => {
 });
 
 // uses identity driver and sends from main
-test("run connects main to drivers", t => {
+test("connects main to drivers", t => {
   // make a fake main that checks for the string it sends to driver
   const m: rxdn.MainFn = (sources: TestSources) => {
     // check that the same string came back as a source
