@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "node-openflow": "file:///Users/dan/code/grind/node-openflow-1.0.0.tgz",
-    "node-rx-server": "^1.0.0",
+    "node-rx-server": "file:///Users/dan/code/grind/node-rx-server",
     "rxjs": "^5.0.0-beta.11"
   }
 }

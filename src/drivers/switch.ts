@@ -9,39 +9,45 @@ const defaults: ListenOptions = {
   host: "localhost",
 };
 
-interface MessageStream {
+export interface SwitchInput {
   socket: Socket;
   message: OpenFlowMessage;
 }
 
-interface ErrorStream {
-  function: string;
-  error: Error;
+export enum SwitchOutputType {
+  error, message, connection, disconnection
 }
 
-type switchSource = Observable<MessageStream | ErrorStream>;
+export interface SwitchOutput {
+  type: SwitchOutputType;
+  socket?: Socket;
+  message?: OpenFlowMessage;
+  error?: Error;
+}
 
-function makeSwitchDriver(options?: ListenOptions) {
+export function makeSwitchDriver(options?: ListenOptions) {
   if (!options) {
     options = defaults;
   }
 
-  // set up the server its source observable
+  // set up the server as main's source observable
   const server = createRxServer(options);
-  const source: switchSource = server.map(connection => {
-    const decodeOrError = connection.map(({socket, buffer}) => {
+  const connections: Observable<SwitchOutput> = server
+    .map(connection => ({type: SwitchOutputType.connection, socket: connection.socket}));
+  const data: SwitchOutput = server
+    .map(connection => connection.data)
+    .map(buffer => {
       let message: OpenFlowMessage;
       try {
         message = decode(buffer);
       } catch (error) {
-        return ({function: "decode", error});
+        return ({type: "error", socket, error});
       }
-      return {socket, message};
+      return {type: "message", socket, message};
     });
-    return decodeOrError;
-  }).mergeAll();
+  });
 
-  const switchDriver: Driver<MessageStream, MessageStream | ErrorStream> = function(sink) {
+  const switchDriver: Driver<SwitchInput, SwitchOutput> = function(sink) {
     // Encode and write sink messages to its socket
     if (sink) {
       sink
@@ -57,5 +63,3 @@ function makeSwitchDriver(options?: ListenOptions) {
   };
   return switchDriver;
 };
-
-export {MessageStream, ErrorStream, switchSource, makeSwitchDriver};
