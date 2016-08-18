@@ -7,11 +7,13 @@ import * as net from "net";
 import * as rxdn from "../rxdn";
 import {Observable} from "rxjs";
 
+const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;
+
 interface Sources extends rxdn.ObservableCollection {
   switchDriver: rxdn.switchSource;
 }
 
-const TEST_INCREMENT = 200; // separation in ms between tests
+const TEST_INCREMENT = 100; // separation in ms between tests
 const ERROR_TEST_PORT = 1234;
 const ERROR_TEST_WAIT = TEST_INCREMENT;
 const MSG_TEST_PORT = 1235;
@@ -35,31 +37,51 @@ function msgClient() {
 }
 setTimeout(msgClient, MSG_TEST_WAIT);
 
-test("exposes errors", t => {
+test.cb("exposes errors", t => {
+  t.plan(2);
   const main: rxdn.MainFn = (sources: Sources) => {
     const [messages, errors] = <[Observable<rxdn.MessageStream>, Observable<rxdn.ErrorStream>]> sources.switchDriver
       .partition(x => "message" in x);
-    errors.map(e => {
+    // check that there is an error as the sink
+    const err = errors.map(e => {
       t.is(e.function, "decode");
       t.truthy(e.error instanceof Error);
+      t.end();
     });
-    messages.map(m => t.fail());
-    return {switchDriver: Observable.never()};
+    // if there was a message, it's wrong
+    const msg = messages.map(m => t.fail());
+    return {
+      switchDriver: Observable.never(),
+      subscribeDriver: err.merge(msg),
+    };
   };
-  const drivers: rxdn.Drivers = {switchDriver: rxdn.makeSwitchDriver({port: ERROR_TEST_PORT})};
+  const drivers: rxdn.Drivers = {
+    switchDriver: rxdn.makeSwitchDriver({port: ERROR_TEST_PORT}),
+    subscribeDriver: identityDriver,
+  };
   rxdn.run(main, drivers);
 });
 
-test("decodes messages", t => {
+test.cb("decodes messages", t => {
+  t.plan(1);
   const main: rxdn.MainFn = (sources: Sources) => {
     const [messages, errors] = <[Observable<rxdn.MessageStream>, Observable<rxdn.ErrorStream>]> sources.switchDriver
       .partition(x => "message" in x);
-    errors.map(e => t.fail());
-    messages.map(m => {
+    // if there are errros, it's wrong
+    const err = errors.map(e => t.fail());
+    // check the message as the sink
+    const msg = messages.map(m => {
       t.deepEqual(m.message, new rxdn.Hello());
+      t.end();
     });
-    return {switchDriver: Observable.never()};
+    return {
+      switchDriver: Observable.never(),
+      subscribeDriver: err.merge(msg),
+    };
   };
-  const drivers: rxdn.Drivers = {switchDriver: rxdn.makeSwitchDriver({port: MSG_TEST_PORT})};
+  const drivers: rxdn.Drivers = {
+    switchDriver: rxdn.makeSwitchDriver({port: MSG_TEST_PORT}),
+    subscribeDriver: identityDriver,
+  };
   rxdn.run(main, drivers);
 });
