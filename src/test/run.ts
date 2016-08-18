@@ -18,29 +18,41 @@ test("returns a subscription", t => {
 });
 
 // uses identity main and injects from driver
-test("connects drivers to main", t => {
+test.cb("connects drivers to main", t => {
+  t.plan(1);
   // make a fake driver that checks for the string it injects
-  const d: rxdn.Driver<string, string> = (sink) => {
+  const driver: rxdn.Driver<string, string> = (sink) => {
     if (!sink) {
       t.fail();
       return;
     }
     // check that the same string came back as a sink
-    sink.subscribe(str => t.is(str, testString));
+    sink.subscribe(str => {
+      t.is(str, testString);
+      t.end();
+    });
     // inject test string as a source
     return Observable.of(testString);
   };
-  rxdn.run(identityMain, {d});
+  rxdn.run(identityMain, {driver});
 });
 
 // uses identity driver and sends from main
-test("connects main to drivers", t => {
+test.cb("connects main to drivers", t => {
+  t.plan(1);
   // make a fake main that checks for the string it sends to driver
-  const m: rxdn.MainFn = (sources: TestSources) => {
+  const main: rxdn.MainFn = (sources: TestSources) => {
     // check that the same string came back as a source
-    sources.testDriver.map(str => t.is(str, testString));
+    const sinks = sources.testDriver.map(str => {
+      t.is(str, testString);
+      t.end();
+    });
     // send test string to driver
-    return {testDriver: Observable.of(testString)};
+    return {
+      testDriver: Observable.of(testString),
+      subscribeDriver: sinks,
+    };
   };
-  rxdn.run(m, {testDriver: identityDriver});
+  // need a subscribe driver to make `sinks` actually happen (or could subscribe in main)
+  rxdn.run(main, {testDriver: identityDriver, subscribeDriver: identityDriver});
 });
