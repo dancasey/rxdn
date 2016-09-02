@@ -19,18 +19,21 @@ const main: rxdn.MainFn = (sources: Sources) => {
   const consoleDriver = sources.openflowDriver
     .map(({event, id, message, error}) => `${rxdn.OFDEvent[event]} ${id} ${show(message)} ${show(error)}`);
 
+  // Run Core component
+  const {openflowDriver} = rxdn.Core(sources);
+
   // Send a `Hello` message upon connection
-  const openflowDriver: Observable<rxdn.OFDSink> = sources.openflowDriver
-    .filter(ev => ev.event === rxdn.OFDEvent.Connection)
-    .do(ev => console.log(`I see a connection ${insp(ev)}`))
-    .map(ev => ({id: ev.id, message: new rxdn.Hello()}));
+  // const openflowDriver: Observable<rxdn.OFDSink> = sources.openflowDriver
+  //   .filter(ev => ev.event === rxdn.OFDEvent.Connection)
+  //   .do(ev => console.log(`I see a connection ${insp(ev)}`))
+  //   .map(ev => ({id: ev.id, message: new rxdn.Hello()}));
 
   return {consoleDriver, openflowDriver};
 };
 
 const drivers: rxdn.Drivers = {
   consoleDriver: rxdn.consoleDriver,
-  openflowDriver: rxdn.makeOpenFlowDriver(),
+  openflowDriver: rxdn.makeOpenFlowDriver({host: "0.0.0.0", port: 6653}),
 };
 
 rxdn.run(main, drivers);
