@@ -1,1 +1,1 @@
-export * from "./components/netswitch";
+export * from "./components/core";
