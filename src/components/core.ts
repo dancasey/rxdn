@@ -7,7 +7,7 @@
 
 import {Observable} from "rxjs";
 import {ObservableCollection} from "../interfaces";
-import {OFDSource, OFDEvent, OFDSink} from "../drivers";
+import {OFDSource, OFDEvent, OFDSink} from "../drivers/openflow";
 import * as OF from "node-openflow";
 
 export interface CoreSources extends ObservableCollection {
