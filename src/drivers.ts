@@ -1,2 +1,2 @@
-export * from "./drivers/switch";
+export * from "./drivers/openflow";
 export * from "./drivers/console";

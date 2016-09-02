@@ -1,11 +1,8 @@
 import {Driver} from "../interfaces";
 
-let consoleDriver: Driver<string, void>;
-consoleDriver = msg$ => {
-  if (msg$) {
+export const consoleDriver: Driver<string, void> = (message) => {
+  if (message) {
     /* tslint:disable-next-line:no-console */
-    msg$.subscribe(msg => console.log(msg));
+    message.subscribe(msg => console.log(msg));
   }
 };
-
-export {consoleDriver};
