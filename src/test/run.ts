@@ -1,4 +1,8 @@
-/* run tests with `npm test` */
+/**
+ * Test `run.ts`
+ * Run with `npm test`
+ */
+
 /* tslint:disable:no-string-literals */
 import test from "ava";
 import * as rxdn from "../rxdn";

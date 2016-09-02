@@ -1,5 +1,5 @@
 /**
- * Test `drivers/switch.ts`
+ * Test `drivers/openflow.ts`
  * Run with `npm test`
  */
 import test, {ContextualCallbackTestContext} from "ava";
@@ -13,7 +13,7 @@ interface Sources extends rxdn.ObservableCollection {
   openflowDriver: Observable<rxdn.OFDSource>;
 }
 
-const CLIENT_DELAY = 10; // setTimeout delay for clients
+const CLIENT_DELAY = 50; // setTimeout delay for clients
 const ERROR_TEST_PORT = 1234;
 const DECODE_TEST_PORT = ERROR_TEST_PORT + 1;
 const ENCODE_TEST_PORT = DECODE_TEST_PORT + 1;
