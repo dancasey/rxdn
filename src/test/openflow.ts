@@ -33,7 +33,7 @@ setTimeout(errorClient, CLIENT_DELAY);
 
 test.cb("exposes errors", t => {
   t.plan(2);
-  const main: rxdn.MainFn = (sources: Sources) => {
+  const main: rxdn.Component = (sources: Sources) => {
     const err = sources.openflowDriver
       .filter(m => m.event === rxdn.OFDEvent.Error)
       .map(m => {
@@ -69,7 +69,7 @@ setTimeout(decodeClient, CLIENT_DELAY);
 
 test.cb("decodes messages", t => {
   t.plan(1);
-  const main: rxdn.MainFn = (sources: Sources) => {
+  const main: rxdn.Component = (sources: Sources) => {
     const err = sources.openflowDriver
       .filter(e => e.event === rxdn.OFDEvent.Error)
       .map(e => t.fail());
@@ -114,7 +114,7 @@ function encodeClient(t: ContextualCallbackTestContext) {
 
 test.cb("encodes messages", t => {
   t.plan(1);
-  const main: rxdn.MainFn = (sources: Sources) => {
+  const main: rxdn.Component = (sources: Sources) => {
     const output = sources.openflowDriver
       .filter(e => e.event === rxdn.OFDEvent.Connection)
       .map(e => ({id: e.id, message: new rxdn.Hello()}));

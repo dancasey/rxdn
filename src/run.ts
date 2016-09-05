@@ -1,5 +1,5 @@
 import {Observable, Subscription, ReplaySubject} from "rxjs";
-import {ObservableCollection, SubjectCollection, MainFn, Drivers} from "./interfaces";
+import {ObservableCollection, SubjectCollection, Component, Drivers} from "./interfaces";
 
 function makeProxies(drivers: Drivers): SubjectCollection {
   const proxies: SubjectCollection = {};
@@ -33,7 +33,7 @@ function subscribeAll(sinks: ObservableCollection, proxies: SubjectCollection): 
   return subscription;
 }
 
-export function run(main: MainFn, drivers: Drivers): Subscription {
+export function run(main: Component, drivers: Drivers): Subscription {
   const proxies = makeProxies(drivers);
   const sources = callDrivers(drivers, proxies);
   const sinks = main(sources);

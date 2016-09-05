@@ -9,7 +9,7 @@ import * as rxdn from "../rxdn";
 import {Subscription, Observable} from "rxjs";
 
 const testString = "test 1 2 3";
-const identityMain: rxdn.MainFn = sources => sources;
+const identityMain: rxdn.Component = sources => sources;
 const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;
 const testDriver: rxdn.Driver<void, string> = () => Observable.of(testString);
 
@@ -45,7 +45,7 @@ test.cb("connects drivers to main", t => {
 test.cb("connects main to drivers", t => {
   t.plan(1);
   // make a fake main that checks for the string it sends to driver
-  const main: rxdn.MainFn = (sources: TestSources) => {
+  const main: rxdn.Component = (sources: TestSources) => {
     // check that the same string came back as a source
     const sinks = sources.testDriver.map(str => {
       t.is(str, testString);

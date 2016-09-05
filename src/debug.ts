@@ -14,7 +14,7 @@ interface Sources extends rxdn.ObservableCollection {
   openflowDriver: Observable<rxdn.OFDSource>;
 }
 
-const main: rxdn.MainFn = (sources: Sources) => {
+const main: rxdn.Component = (sources: Sources) => {
   // Print some debug info to the console
   const consoleDriver = sources.openflowDriver
     .map(({event, id, message, error}) => `${rxdn.OFDEvent[event]} ${id} ${show(message)} ${show(error)}`);

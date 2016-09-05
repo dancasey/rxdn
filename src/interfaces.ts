@@ -8,7 +8,7 @@ export interface SubjectCollection {
   [name: string]: ReplaySubject<any>;
 }
 
-export interface MainFn {
+export interface Component {
   (sources: ObservableCollection): ObservableCollection;
 }
 
