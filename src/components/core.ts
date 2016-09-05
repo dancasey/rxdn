@@ -15,6 +15,7 @@ export interface CoreSources extends ObservableCollection {
 }
 
 export interface CoreSinks extends ObservableCollection {
+  next: Observable<OFDSource>;
   openflowDriver: Observable<OFDSink>;
 }
 
@@ -39,10 +40,24 @@ Core = (sources) => {
       return {id, message: reply};
     });
 
+  // For chained components, filter out EchoRequest messages
+  const next: Observable<OFDSource> = sources.openflowDriver
+    .filter(ev => {
+      if (ev.event === OFDEvent.Message && ev.message) {
+        if (ev.message.name === "ofp_echo_request") {
+          return false;
+        }
+      }
+      return true;
+    });
+
   const openflowDriver: Observable<OFDSink> = Observable.merge(
     Hello,
     EchoReply
   );
 
-  return {openflowDriver};
+  return {
+    next,
+    openflowDriver,
+  };
 };
