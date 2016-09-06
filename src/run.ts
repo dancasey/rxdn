@@ -1,5 +1,9 @@
 import {Observable, Subscription, ReplaySubject} from "rxjs";
-import {ObservableCollection, SubjectCollection, Component, Drivers} from "./interfaces";
+import {ObservableCollection, Component, Drivers} from "./interfaces";
+
+interface SubjectCollection {
+  [name: string]: ReplaySubject<any>;
+}
 
 function makeProxies(drivers: Drivers): SubjectCollection {
   const proxies: SubjectCollection = {};
