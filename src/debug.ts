@@ -20,7 +20,7 @@ const main: rxdn.Component = (sources: Sources) => {
     .map(({event, id, message, error}) => `${rxdn.OFDEvent[event]} ${id} ${show(message)} ${show(error)}`);
 
   // Run Core component
-  const {openflowDriver} = rxdn.Core(sources);
+  const {openflowDriver} = rxdn.Core(sources.openflowDriver);
 
   // Send a `Hello` message upon connection
   // const openflowDriver: Observable<rxdn.OFDSink> = sources.openflowDriver
