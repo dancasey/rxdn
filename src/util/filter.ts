@@ -1,6 +1,6 @@
 
 import {Observable} from "rxjs";
-import {OFDSource, OFDEvent} from "../../drivers/openflow";
+import {OFDSource, OFDEvent} from "../drivers/openflow";
 
 /**
  * Filters out a type of OpenFlow message from the stream

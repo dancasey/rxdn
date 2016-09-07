@@ -1,6 +1,6 @@
 import {Observable} from "rxjs";
 import {OFDSource, OFDEvent, OFDSink} from "../../drivers/openflow";
-import {Filter} from "./filter";
+import {Filter} from "../../util/filter";
 import * as OF from "node-openflow";
 
 /**
