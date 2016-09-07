@@ -1,5 +1,4 @@
 /**
- * Test `run.ts`
  * Run with `npm test`
  */
 
