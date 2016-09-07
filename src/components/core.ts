@@ -10,14 +10,13 @@ import {Echo} from "./core/echo";
  * - Replies to echo requests
  * - Returns sources.openflowDriver without `EchoRequest`s
  */
-export const Core = (source: Observable<OFDSource>) => {
-  const reply = Echo(source);
-  const hello = Hello(source);
+export const Core = (sources: {openflowDriver: Observable<OFDSource>}) => {
+  const reply = Echo(sources.openflowDriver);
+  const hello = Hello(sources.openflowDriver);
   const openflowDriver = reply.openflowDriver.merge(hello.openflowDriver);
-  const next = reply.next;
 
   return {
-    next,
-    openflowDriver,
+    sources: {openflowDriver: reply.next},
+    sinks: {openflowDriver},
   };
 };

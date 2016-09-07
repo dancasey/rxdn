@@ -9,7 +9,7 @@ import * as rxdn from "../rxdn";
 import {Subscription, Observable} from "rxjs";
 
 const testString = "test 1 2 3";
-const identityMain: rxdn.Component = sources => sources;
+const identityMain: rxdn.Component = sources => ({sinks: sources, sources});
 const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;
 const testDriver: rxdn.Driver<void, string> = () => Observable.of(testString);
 
@@ -53,8 +53,11 @@ test.cb("connects main to drivers", t => {
     });
     // send test string to driver
     return {
-      testDriver: Observable.of(testString),
-      subscribeDriver: sinks,
+      sources,
+      sinks: {
+        testDriver: Observable.of(testString),
+        subscribeDriver: sinks,
+      },
     };
   };
   // need a subscribe driver to make `sinks` actually happen (or could subscribe in main)

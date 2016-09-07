@@ -9,17 +9,16 @@ export interface ObservableCollection {
 
 /**
  * A Component is a function which accepts a source of Observables indexed by key (an ObservableCollection)
- * and returns the same. It should not pull values or data externally nor should it create
- * side-effects, as these are both the function of a Driver.
+ * and returns sources as inputs to composed Components and sinks as inputs to Drivers.
+ * A Component should not create side-effects, as this is the function of a Driver.
  */
 export interface Component {
-  (sources: ObservableCollection): ObservableCollection;
+  (sources: ObservableCollection): {sources: ObservableCollection, sinks: ObservableCollection};
 }
 
 /**
  * A Driver is a function which *may* accept an Observable (a Sink) and *may* return
  * an Observable (a Source); it should at least do one of these, or it is pointless.
- *
  * The Driver is the place to acquire events or data from external sources and to create side-effects.
  */
 export interface Driver<Sink, Source> {

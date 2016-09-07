@@ -13,7 +13,7 @@ interface Sources extends rxdn.ObservableCollection {
   openflowDriver: Observable<rxdn.OFDSource>;
 }
 
-const CLIENT_DELAY = 50; // setTimeout delay for clients
+const CLIENT_DELAY = 100; // setTimeout delay for clients
 const ERROR_TEST_PORT = 1234;
 const DECODE_TEST_PORT = ERROR_TEST_PORT + 1;
 const ENCODE_TEST_PORT = DECODE_TEST_PORT + 1;
@@ -43,8 +43,11 @@ test.cb("exposes errors", t => {
         return null;
       });
     return {
-      openflowDriver: Observable.never(),
-      subscribeDriver: err,
+      sinks: {
+        openflowDriver: Observable.never(),
+        subscribeDriver: err,
+      },
+      sources,
     };
   };
   const drivers: rxdn.Drivers = {
@@ -80,8 +83,11 @@ test.cb("decodes messages", t => {
         t.end();
       });
     return {
-      openflowDriver: Observable.never(),
-      subscribeDriver: err.merge(msg),
+      sinks: {
+        openflowDriver: Observable.never(),
+        subscribeDriver: err.merge(msg),
+      },
+      sources,
     };
   };
   const drivers: rxdn.Drivers = {
@@ -120,7 +126,10 @@ test.cb("encodes messages", t => {
       .map(e => ({id: e.id, message: new rxdn.Hello()}));
 
     return {
-      openflowDriver: output,
+      sinks: {
+        openflowDriver: output,
+      },
+      sources,
     };
   };
   const drivers: rxdn.Drivers = {

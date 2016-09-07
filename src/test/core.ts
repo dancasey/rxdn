@@ -7,7 +7,7 @@ test("Sends `Hello` on new connection", t => {
     event: rxdn.OFDEvent.Connection,
     id: "1.1.1.1:1234",
   });
-  const result: Observable<any> = rxdn.Core(source).openflowDriver
+  const result: Observable<any> = rxdn.Core({openflowDriver: source}).sinks.openflowDriver
     .map(m => t.deepEqual(m.message, new rxdn.Hello()));
   return result;
 });
@@ -18,7 +18,7 @@ test("Sends `EchoReply` for `EchoRequest`", t => {
     id: "1.1.1.1:1234",
     message: new rxdn.EchoRequest(),
   });
-  const result: Observable<any> = rxdn.Core(source).openflowDriver
+  const result: Observable<any> = rxdn.Core({openflowDriver: source}).sinks.openflowDriver
     .map(m => t.deepEqual(m.message, new rxdn.EchoReply()));
   return result;
 });
@@ -41,7 +41,7 @@ test("Sends `EchoReply` with matching xid and data", t => {
     message: request,
   });
 
-  const result: Observable<any> = rxdn.Core(source).openflowDriver
+  const result: Observable<any> = rxdn.Core({openflowDriver: source}).sinks.openflowDriver
     .map(m => t.deepEqual(m.message, reply));
   return result;
 });

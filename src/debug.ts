@@ -10,25 +10,18 @@ import {inspect} from "util";
 const insp = (obj: any) => inspect(obj, {colors: true, depth: 4});
 const show = (item: any) => item ? item instanceof Object ? insp(item) : item : "";
 
-interface Sources extends rxdn.ObservableCollection {
-  openflowDriver: Observable<rxdn.OFDSource>;
-}
-
-const main: rxdn.Component = (sources: Sources) => {
+const main: rxdn.Component = (sources: {openflowDriver: Observable<rxdn.OFDSource>}) => {
   // Print some debug info to the console
   const consoleDriver = sources.openflowDriver
     .map(({event, id, message, error}) => `${rxdn.OFDEvent[event]} ${id} ${show(message)} ${show(error)}`);
 
-  // Run Core component
-  const {openflowDriver} = rxdn.Core(sources.openflowDriver);
+  const core = rxdn.Core(sources);
+  const sinks = Object.assign({}, {consoleDriver}, core.sinks);
 
-  // Send a `Hello` message upon connection
-  // const openflowDriver: Observable<rxdn.OFDSink> = sources.openflowDriver
-  //   .filter(ev => ev.event === rxdn.OFDEvent.Connection)
-  //   .do(ev => console.log(`I see a connection ${insp(ev)}`))
-  //   .map(ev => ({id: ev.id, message: new rxdn.Hello()}));
-
-  return {consoleDriver, openflowDriver};
+  return {
+    sources: core.sources,
+    sinks,
+  };
 };
 
 const drivers: rxdn.Drivers = {

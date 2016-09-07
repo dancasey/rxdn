@@ -40,7 +40,7 @@ function subscribeAll(sinks: ObservableCollection, proxies: SubjectCollection): 
 export function run(main: Component, drivers: Drivers): Subscription {
   const proxies = makeProxies(drivers);
   const sources = callDrivers(drivers, proxies);
-  const sinks = main(sources);
+  const {sinks} = main(sources);
   const subscription = subscribeAll(sinks, proxies);
   return subscription;
 }
