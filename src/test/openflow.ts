@@ -9,10 +9,6 @@ import {Observable} from "rxjs";
 
 const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;
 
-interface Sources extends rxdn.ObservableCollection {
-  openflowDriver: Observable<rxdn.OFDSource>;
-}
-
 const CLIENT_DELAY = 100; // setTimeout delay for clients
 const ERROR_TEST_PORT = 1234;
 const DECODE_TEST_PORT = ERROR_TEST_PORT + 1;
@@ -33,22 +29,20 @@ setTimeout(errorClient, CLIENT_DELAY);
 
 test.cb("exposes errors", t => {
   t.plan(2);
-  const main: rxdn.Component = (sources: Sources) => {
+  const main: rxdn.OFComponent = sources => {
     const err = sources.openflowDriver
       .filter(m => m.event === rxdn.OFDEvent.Error)
-      .map(m => {
+      .map((m: rxdn.OFDError) => {
         t.is(m.event, rxdn.OFDEvent.Error);
         t.true(m.error instanceof Error);
         t.end();
         return null;
       });
-    return {
-      sinks: {
-        openflowDriver: Observable.never(),
-        subscribeDriver: err,
-      },
-      sources,
+    const sinks = {
+      openflowDriver: sources.openflowDriver.filter(() => false),
+      subscribeDriver: err,
     };
+    return {sinks, sources};
   };
   const drivers: rxdn.Drivers = {
     openflowDriver: rxdn.makeOpenFlowDriver({port: ERROR_TEST_PORT}),
@@ -72,23 +66,21 @@ setTimeout(decodeClient, CLIENT_DELAY);
 
 test.cb("decodes messages", t => {
   t.plan(1);
-  const main: rxdn.Component = (sources: Sources) => {
+  const main: rxdn.OFComponent = sources => {
     const err = sources.openflowDriver
       .filter(e => e.event === rxdn.OFDEvent.Error)
       .map(e => t.fail());
     const msg = sources.openflowDriver
       .filter(e => e.event === rxdn.OFDEvent.Message)
-      .map(m => {
+      .map((m: rxdn.OFDMessage) => {
         t.deepEqual(m.message, new rxdn.Hello());
         t.end();
       });
-    return {
-      sinks: {
-        openflowDriver: Observable.never(),
-        subscribeDriver: err.merge(msg),
-      },
-      sources,
+    const sinks = {
+      openflowDriver: sources.openflowDriver.filter(() => false),
+      subscribeDriver: err.merge(msg),
     };
+    return {sinks, sources};
   };
   const drivers: rxdn.Drivers = {
     openflowDriver: rxdn.makeOpenFlowDriver({port: DECODE_TEST_PORT}),
@@ -120,17 +112,17 @@ function encodeClient(t: ContextualCallbackTestContext) {
 
 test.cb("encodes messages", t => {
   t.plan(1);
-  const main: rxdn.Component = (sources: Sources) => {
-    const output = sources.openflowDriver
-      .filter(e => e.event === rxdn.OFDEvent.Connection)
-      .map(e => ({id: e.id, message: new rxdn.Hello()}));
-
-    return {
-      sinks: {
-        openflowDriver: output,
-      },
-      sources,
+  const main: rxdn.OFComponent = sources => {
+    const sinks = {
+      openflowDriver: sources.openflowDriver
+        .filter(e => e.event === rxdn.OFDEvent.Connection)
+        .map(e => ({
+          event: rxdn.OFDEvent.Message,
+          id: e.id,
+          message: new rxdn.Hello(),
+        })) as Observable<rxdn.OpenFlow>,
     };
+    return {sinks, sources};
   };
   const drivers: rxdn.Drivers = {
     openflowDriver: rxdn.makeOpenFlowDriver({port: ENCODE_TEST_PORT}),

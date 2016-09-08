@@ -3,7 +3,7 @@
  */
 
 import {OpenFlowMessage, decode} from "node-openflow";
-import {Driver} from "../interfaces";
+import {Driver, ObservableCollection} from "../interfaces";
 import {createServer, Socket, ListenOptions} from "net";
 import {Observable, Observer} from "rxjs";
 
@@ -15,30 +15,31 @@ export enum OFDEvent {
   Message
 }
 
-/**
- * The Object type that is returned in an Observable from openFlowDriver to main
- * @typedef {Object}
- * @param {number} event Enumerated event type
- * @param {string} id Socket id
- * @param {OpenFlowMessage} [message] The decoded message received
- * @param {Error} [error] The error
- */
-export interface OFDSource {
-  event: OFDEvent;
+export interface OFDSocket {
+  event: OFDEvent.Connection | OFDEvent.Disconnection;
   id: string;
-  message?: OpenFlowMessage;
-  error?: Error;
 }
 
-/**
- * The Object type that is returned in an Observable from main to openFlowDriver
- * @typedef {Object}
- * @param {string} id
- * @param {OpenFlowMessage} message Message to send
- */
-export interface OFDSink {
+export interface OFDError {
+  event: OFDEvent.Error;
+  id: string;
+  error: Error;
+}
+
+export interface OFDMessage {
+  event: OFDEvent.Message;
   id: string;
   message: OpenFlowMessage;
+}
+
+export type OpenFlow = OFDSocket | OFDError | OFDMessage;
+
+export interface OFCollection extends ObservableCollection {
+  openflowDriver: Observable<OpenFlow>;
+}
+
+export interface OFComponent {
+  (sources: OFCollection): {sources: OFCollection, sinks: OFCollection};
 }
 
 const defaultOptions: ListenOptions = {
@@ -60,7 +61,7 @@ export const socketId = (socket: Socket): string => {
 export function makeOpenFlowDriver(options = defaultOptions) {
   const sockets: Map<string, Socket> = new Map();
   const server = createServer();
-  const source = new Observable<OFDSource>((observer: Observer<OFDSource>) => {
+  const source = new Observable<OpenFlow>((observer: Observer<OpenFlow>) => {
     server.listen(options);
     server.on("connection", (socket: Socket) => {
       // Add socket to map
@@ -94,24 +95,27 @@ export function makeOpenFlowDriver(options = defaultOptions) {
     server.on("error", (error: Error) => observer.error(error));
   }).share();
 
-  const openFlowDriver: Driver<OFDSink, OFDSource> = (sink) => {
+  const openFlowDriver: Driver<OpenFlow, OpenFlow> = (sink) => {
     // Send outgoing message
     let buffer: Buffer;
     if (sink) {
       sink.subscribe({
         next: outgoing => {
-          // Get the socket
-          const socket = sockets.get(outgoing.id);
-          if (!socket) {
-            console.error(`openFlowDriver: No socket ${outgoing.id}`);
-            return;
-          }
-          // Try to encode the message
-          try {
-            buffer = outgoing.message.encode();
-            socket.write(buffer);
-          } catch (error) {
-            console.error(`openFlowDriver: Could not encode: ${error}`);
+          // Ignore anything that is not type `Message`
+          if (outgoing.event === OFDEvent.Message) {
+            // Get the socket
+            const socket = sockets.get(outgoing.id);
+            if (!socket) {
+              console.error(`openFlowDriver: No socket ${outgoing.id}`);
+              return;
+            }
+            // Try to encode the message
+            try {
+              buffer = outgoing.message.encode();
+              socket.write(buffer);
+            } catch (error) {
+              console.error(`openFlowDriver: Could not encode: ${error}`);
+            }
           }
         },
         error: (err) => server.close(),
