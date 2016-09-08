@@ -1,33 +1,33 @@
-import {Observable} from "rxjs";
-import {OFDSource, OFDEvent, OFDSink} from "../../drivers/openflow";
+import {OFComponent, OFDEvent, OFDMessage} from "../../drivers/openflow";
 import {Filter} from "../../util/filter";
 import * as OF from "node-openflow";
 
-/**
- * Replies to EchoRequest messages and removes them from `next`
- * @param {Observable<OFDSource>} source
- * @returns {ObservableCollection}
- */
-export const Echo = (source: Observable<OFDSource>) => {
-  // Send an `EchoReply` whenever an `EchoRequest` is received
-  const openflowDriver: Observable<OFDSink> = source
-    .filter(({event}) => event === OFDEvent.Message)
-    .filter(({message}) => (message as OF.OpenFlowMessage).name === "ofp_echo_request")
-    .map(({id, message}) => {
-      const reply = new OF.EchoReply();
-      // TODO fix upstream so type assertion isn't necessary
-      if (message && (<OF.EchoRequest> message).data) {
-        reply.data = (<OF.EchoRequest> message).data;
-      }
-      reply.message.header.xid = (<OF.EchoRequest> message).message.header.xid;
-      return {id, message: reply};
-    });
+/** Replies to EchoRequest messages and removes them from outgoing sources */
+export const Echo: OFComponent = sources => {
+  const sinks = {
+    openflowDriver: sources.openflowDriver
+      .filter(({event}) => event === OFDEvent.Message)
+      .filter((m: OFDMessage) => m.message.name === "ofp_echo_request")
+      .map((m: OFDMessage) => {
+        const reply = new OF.EchoReply();
+        // TODO fix upstream so type assertion isn't necessary
+        if (m.message && (<OF.EchoRequest> m.message).data) {
+          reply.data = (<OF.EchoRequest> m.message).data;
+        }
+        reply.message.header.xid = (<OF.EchoRequest> m.message).message.header.xid;
+        const result: OFDMessage = {
+          event: OFDEvent.Message,
+          id: m.id,
+          message: reply,
+        };
+        return result;
+      }),
+  };
 
   // For chained components, filter out EchoRequest messages
-  const next: Observable<OFDSource> = Filter(source, "ofp_echo_request");
-
-  return {
-    next,
-    openflowDriver,
+  const outSource = {
+    openflowDriver: Filter(sources.openflowDriver, "ofp_echo_request"),
   };
+
+  return {sources: outSource, sinks};
 };
