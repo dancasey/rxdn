@@ -1,8 +1,6 @@
 import {Observable} from "rxjs";
 
-/**
- * A collection of Observables indexed by key
- */
+/** A collection of Observables indexed by key */
 export interface ObservableCollection {
   [name: string]: Observable<any>;
 }
@@ -25,9 +23,7 @@ export interface Driver<Sink, Source> {
   (sinks?: Observable<Sink>): void | Observable<Source>;
 }
 
-/**
- * A collection of Drivers indexed by key
- */
+/** A collection of Drivers indexed by key */
 export interface Drivers {
   [name: string]: Driver<any, any>;
 }
