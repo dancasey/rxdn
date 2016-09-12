@@ -1,13 +1,13 @@
-import {OFComponent, OFDEvent, OpenFlow} from "../../drivers/openflow";
+import {OFComponent, OFEvent, OpenFlow} from "../../drivers/openflow";
 import * as OF from "node-openflow";
 
 /** Sends a Hello message upon connection */
 export const Hello: OFComponent = sources => {
   const hello = sources.openflowDriver
-    .filter(m => m.event === OFDEvent.Connection)
+    .filter(m => m.event === OFEvent.Connection)
     .map(m => {
       const result: OpenFlow = {
-        event: OFDEvent.Message,
+        event: OFEvent.Message,
         id: m.id,
         message: new OF.Hello(),
       };

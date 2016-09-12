@@ -5,22 +5,22 @@ import {Observable} from "rxjs";
 test("Sends `Hello` on new connection", t => {
   const openflowDriver = Observable.of({
     id: "1.1.1.1:1234",
-    event: rxdn.OFDEvent.Connection,
+    event: rxdn.OFEvent.Connection,
   } as rxdn.OpenFlow);
   const result: Observable<any> = rxdn.Core({openflowDriver}).sinks.openflowDriver
-    .map((m: {id: string, event: rxdn.OFDEvent.Message, message: rxdn.OpenFlowMessage}) =>
+    .map((m: {id: string, event: rxdn.OFEvent.Message, message: rxdn.OpenFlowMessage}) =>
       t.deepEqual(m.message, new rxdn.Hello()));
   return result;
 });
 
 test("Sends `EchoReply` for `EchoRequest`", t => {
   const openflowDriver = Observable.of({
-    event: rxdn.OFDEvent.Message,
+    event: rxdn.OFEvent.Message,
     id: "1.1.1.1:1234",
     message: new rxdn.EchoRequest(),
   } as rxdn.OpenFlow);
   const result: Observable<any> = rxdn.Core({openflowDriver}).sinks.openflowDriver
-    .map((m: {id: string, event: rxdn.OFDEvent.Message, message: rxdn.OpenFlowMessage}) =>
+    .map((m: {id: string, event: rxdn.OFEvent.Message, message: rxdn.OpenFlowMessage}) =>
       t.deepEqual(m.message, new rxdn.EchoReply()));
   return result;
 });
@@ -38,13 +38,13 @@ test("Sends `EchoReply` with matching xid and data", t => {
   reply.data = data;
 
   const openflowDriver = Observable.of({
-    event: rxdn.OFDEvent.Message,
+    event: rxdn.OFEvent.Message,
     id: "1.1.1.1:1234",
     message: request,
   } as rxdn.OpenFlow);
 
   const result: Observable<any> = rxdn.Core({openflowDriver}).sinks.openflowDriver
-    .map((m: {id: string, event: rxdn.OFDEvent.Message, message: rxdn.OpenFlowMessage}) =>
+    .map((m: {id: string, event: rxdn.OFEvent.Message, message: rxdn.OpenFlowMessage}) =>
       t.deepEqual(m.message, reply));
   return result;
 });

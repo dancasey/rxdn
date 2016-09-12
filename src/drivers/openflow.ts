@@ -8,7 +8,7 @@ import {createServer, Socket, ListenOptions} from "net";
 import {Observable, Observer} from "rxjs";
 
 
-export enum OFDEvent {
+export enum OFEvent {
   Connection,
   Disconnection,
   Error,
@@ -16,10 +16,10 @@ export enum OFDEvent {
 }
 
 export type OpenFlow =
-  {id: string, event: OFDEvent.Connection} |
-  {id: string, event: OFDEvent.Disconnection} |
-  {id: string, event: OFDEvent.Error, error: Error} |
-  {id: string, event: OFDEvent.Message, message: OpenFlowMessage};
+  {id: string, event: OFEvent.Connection} |
+  {id: string, event: OFEvent.Disconnection} |
+  {id: string, event: OFEvent.Error, error: Error} |
+  {id: string, event: OFEvent.Message, message: OpenFlowMessage};
 
 export interface OFCollection extends ObservableCollection {
   openflowDriver: Observable<OpenFlow>;
@@ -55,25 +55,25 @@ export function makeOpenFlowDriver(options = defaultOptions) {
       let id = socketId(socket);
       sockets.set(id, socket);
       // Tell the observer about the new connection
-      observer.next({event: OFDEvent.Connection, id});
+      observer.next({event: OFEvent.Connection, id});
 
       // Set up listeners on the socket
       socket.on("close", () => {
-        observer.next({event: OFDEvent.Disconnection, id});
+        observer.next({event: OFEvent.Disconnection, id});
         sockets.delete(id);
       });
       socket.on("end", () => {
-        observer.next({event: OFDEvent.Disconnection, id});
+        observer.next({event: OFEvent.Disconnection, id});
         sockets.delete(id);
       });
-      socket.on("error", (error: Error) => observer.next({event: OFDEvent.Error, id, error}));
+      socket.on("error", (error: Error) => observer.next({event: OFEvent.Error, id, error}));
       socket.on("data", (buffer: Buffer) => {
         // Try to decode the buffer into an OpenFlowMessage
         try {
           let message = decode(buffer);
-          observer.next({event: OFDEvent.Message, id, message});
+          observer.next({event: OFEvent.Message, id, message});
         } catch (error) {
-          observer.next({event: OFDEvent.Error, id, error});
+          observer.next({event: OFEvent.Error, id, error});
         }
       });
 
@@ -89,7 +89,7 @@ export function makeOpenFlowDriver(options = defaultOptions) {
       sink.subscribe({
         next: outgoing => {
           // Ignore anything that is not type `Message`
-          if (outgoing.event === OFDEvent.Message) {
+          if (outgoing.event === OFEvent.Message) {
             // Get the socket
             const socket = sockets.get(outgoing.id);
             if (!socket) {
