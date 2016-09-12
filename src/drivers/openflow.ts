@@ -15,24 +15,11 @@ export enum OFDEvent {
   Message
 }
 
-export interface OFDSocket {
-  event: OFDEvent.Connection | OFDEvent.Disconnection;
-  id: string;
-}
-
-export interface OFDError {
-  event: OFDEvent.Error;
-  id: string;
-  error: Error;
-}
-
-export interface OFDMessage {
-  event: OFDEvent.Message;
-  id: string;
-  message: OpenFlowMessage;
-}
-
-export type OpenFlow = OFDSocket | OFDError | OFDMessage;
+export type OpenFlow =
+  {id: string, event: OFDEvent.Connection} |
+  {id: string, event: OFDEvent.Disconnection} |
+  {id: string, event: OFDEvent.Error, error: Error} |
+  {id: string, event: OFDEvent.Message, message: OpenFlowMessage};
 
 export interface OFCollection extends ObservableCollection {
   openflowDriver: Observable<OpenFlow>;

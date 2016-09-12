@@ -32,7 +32,7 @@ test.cb("exposes errors", t => {
   const main: rxdn.OFComponent = sources => {
     const err = sources.openflowDriver
       .filter(m => m.event === rxdn.OFDEvent.Error)
-      .map((m: rxdn.OFDError) => {
+      .map((m: {id: string, event: rxdn.OFDEvent.Error, error: Error}) => {
         t.is(m.event, rxdn.OFDEvent.Error);
         t.true(m.error instanceof Error);
         t.end();
@@ -72,7 +72,7 @@ test.cb("decodes messages", t => {
       .map(e => t.fail());
     const msg = sources.openflowDriver
       .filter(e => e.event === rxdn.OFDEvent.Message)
-      .map((m: rxdn.OFDMessage) => {
+      .map((m: {id: string, event: rxdn.OFDEvent.Message, message: rxdn.OpenFlowMessage}) => {
         t.deepEqual(m.message, new rxdn.Hello());
         t.end();
       });
