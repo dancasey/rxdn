@@ -5,13 +5,13 @@ import {Component, ObservableCollection} from "../interfaces";
  * such that sources output from one component flow as input sources to the next,
  * and sinks from each component are merged as returned as a single sink object.
  */
-export const Compose = (components: Component[], sources: ObservableCollection) => {
+export const Compose = <C extends Component, O extends ObservableCollection>(components: C[], sources: O) => {
   let outSources = sources;
-  let sinks: ObservableCollection = {};
+  let sinks = {} as O;
 
   components.forEach(component => {
     let result = component(outSources);
-    outSources = result.sources;
+    outSources = result.sources as O;
 
     // If the key of the sink is in the sinks, merge them.
     // Otherwise, add it to the sinks object.

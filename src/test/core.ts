@@ -3,23 +3,25 @@ import * as rxdn from "../rxdn";
 import {Observable} from "rxjs";
 
 test("Sends `Hello` on new connection", t => {
-  const source: Observable<rxdn.OFDSource> = Observable.of({
-    event: rxdn.OFDEvent.Connection,
+  const openflowDriver = Observable.of({
     id: "1.1.1.1:1234",
-  });
-  const result: Observable<any> = rxdn.Core({openflowDriver: source}).sinks.openflowDriver
-    .map(m => t.deepEqual(m.message, new rxdn.Hello()));
+    event: rxdn.OFDEvent.Connection,
+  } as rxdn.OpenFlow);
+  const result: Observable<any> = rxdn.Core({openflowDriver}).sinks.openflowDriver
+    .map((m: {id: string, event: rxdn.OFDEvent.Message, message: rxdn.OpenFlowMessage}) =>
+      t.deepEqual(m.message, new rxdn.Hello()));
   return result;
 });
 
 test("Sends `EchoReply` for `EchoRequest`", t => {
-  const source: Observable<rxdn.OFDSource> = Observable.of({
+  const openflowDriver = Observable.of({
     event: rxdn.OFDEvent.Message,
     id: "1.1.1.1:1234",
     message: new rxdn.EchoRequest(),
-  });
-  const result: Observable<any> = rxdn.Core({openflowDriver: source}).sinks.openflowDriver
-    .map(m => t.deepEqual(m.message, new rxdn.EchoReply()));
+  } as rxdn.OpenFlow);
+  const result: Observable<any> = rxdn.Core({openflowDriver}).sinks.openflowDriver
+    .map((m: {id: string, event: rxdn.OFDEvent.Message, message: rxdn.OpenFlowMessage}) =>
+      t.deepEqual(m.message, new rxdn.EchoReply()));
   return result;
 });
 
@@ -35,13 +37,14 @@ test("Sends `EchoReply` with matching xid and data", t => {
   reply.message.header.xid = xid;
   reply.data = data;
 
-  const source: Observable<rxdn.OFDSource> = Observable.of({
+  const openflowDriver = Observable.of({
     event: rxdn.OFDEvent.Message,
     id: "1.1.1.1:1234",
     message: request,
-  });
+  } as rxdn.OpenFlow);
 
-  const result: Observable<any> = rxdn.Core({openflowDriver: source}).sinks.openflowDriver
-    .map(m => t.deepEqual(m.message, reply));
+  const result: Observable<any> = rxdn.Core({openflowDriver}).sinks.openflowDriver
+    .map((m: {id: string, event: rxdn.OFDEvent.Message, message: rxdn.OpenFlowMessage}) =>
+      t.deepEqual(m.message, reply));
   return result;
 });

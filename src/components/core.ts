@@ -1,7 +1,7 @@
-import {Component} from "../interfaces";
+import {OFComponent} from "../drivers/openflow";
 import {Hello} from "./core/hello";
 import {Echo} from "./core/echo";
-import {Compose} from "../util/compose";
+import {Compose} from "./compose";
 
 /**
  * Core OpenFlow component
@@ -10,7 +10,7 @@ import {Compose} from "../util/compose";
  * - Replies to echo requests
  * - Returns sources.openflowDriver without `EchoRequest`s
  */
-export const Core: Component = sources => {
+export const Core: OFComponent = sources => {
   return Compose([
     Echo,
     Hello,

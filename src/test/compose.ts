@@ -27,7 +27,7 @@ const componentSinkOnly: rxdn.Component = (sources: TestSource) => {
     .map(val => `hello ${val}!`);
   return {
     sources,
-    sinks: {sink},
+    sinks: {mixed: sink},
   };
 };
 
@@ -42,7 +42,7 @@ test("Passes sources through components", t => {
 
 test("Collects and merges sinks", t => {
   t.plan(3);
-  const r: Observable<any> = (result.sinks as {sink: Observable<string>}).sink
+  const r: Observable<any> = result.sinks.mixed
     .map(val => t.true(typeof val === "string"));
   return r;
 });
