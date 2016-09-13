@@ -48,3 +48,39 @@ test("Sends `EchoReply` with matching xid and data", t => {
       t.deepEqual(m.message, reply));
   return result;
 });
+
+test("Removes `EchoRequest` from sources", t => {
+  const openflowDriver = Observable.of({
+    id: "1.1.1.1:1234",
+    event: rxdn.OFEvent.Message,
+    message: new rxdn.EchoRequest(),
+  } as rxdn.OpenFlow);
+  const result: Observable<any> = rxdn.Core({openflowDriver}).sources.openflowDriver
+    .map((m: {id: string, event: rxdn.OFEvent.Message, message: rxdn.OpenFlowMessage}) =>
+      t.fail());
+  return result;
+});
+
+test("Sends `FeaturesRequest` on session establishment", t => {
+  const openflowDriver = Observable.of({
+    id: "1.1.1.1:1234",
+    event: rxdn.OFEvent.Message,
+    message: new rxdn.Hello(),
+  } as rxdn.OpenFlow);
+  const result: Observable<any> = rxdn.Core({openflowDriver}).sinks.openflowDriver
+    .map((m: {id: string, event: rxdn.OFEvent.Message, message: rxdn.OpenFlowMessage}) =>
+      t.is(m.message.name, "ofp_features_request"));
+  return result;
+});
+
+test("Removes `FeaturesReply` from sources", t => {
+  const openflowDriver = Observable.of({
+    id: "1.1.1.1:1234",
+    event: rxdn.OFEvent.Message,
+    message: new rxdn.FeaturesReply(),
+  } as rxdn.OpenFlow);
+  const result: Observable<any> = rxdn.Core({openflowDriver}).sources.openflowDriver
+    .map((m: {id: string, event: rxdn.OFEvent.Message, message: rxdn.OpenFlowMessage}) =>
+      t.fail());
+  return result;
+});
