@@ -5,16 +5,11 @@ import * as OF from "node-openflow";
 export const Hello: OFComponent = sources => {
   const hello = sources.openflowDriver
     .filter(m => m.event === OFEvent.Connection)
-    .map(m => {
-      const result: OpenFlow = {
-        event: OFEvent.Message,
-        id: m.id,
-        message: new OF.Hello(),
-      };
-      return result;
+    .map(m => <OpenFlow> {
+      event: OFEvent.Message,
+      id: m.id,
+      message: new OF.Hello(),
     });
-  return {
-    sources,
-    sinks: {openflowDriver: hello},
-  };
+
+  return {sources, sinks: {openflowDriver: hello}};
 };
