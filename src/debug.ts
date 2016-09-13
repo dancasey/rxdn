@@ -10,7 +10,11 @@ interface OFConsoleCollection extends rxdn.OFCollection {
 }
 
 const main: rxdn.OFComponent = src => {
-  return <{sources: rxdn.OFCollection, sinks: OFConsoleCollection}> rxdn.Compose([rxdn.Core, rxdn.OFLog], src);
+  return <{sources: rxdn.OFCollection, sinks: OFConsoleCollection}> rxdn.Compose([
+    rxdn.Core,
+    rxdn.Push,
+    rxdn.OFLog,
+  ], src);
 };
 
 const drivers: rxdn.Drivers = {
