@@ -3,9 +3,14 @@
  * is a suite of tests that run automatically with `npm test`
  */
 import * as rxdn from "./rxdn";
+import {Observable} from "rxjs";
 
-const main: rxdn.OFComponent = sources => {
-  return rxdn.Compose([rxdn.Core, rxdn.OFLog], sources);
+interface OFConsoleCollection extends rxdn.OFCollection {
+  consoleDriver: Observable<string>;
+}
+
+const main: rxdn.OFComponent = src => {
+  return <{sources: rxdn.OFCollection, sinks: OFConsoleCollection}> rxdn.Compose([rxdn.Core, rxdn.OFLog], src);
 };
 
 const drivers: rxdn.Drivers = {

@@ -1,4 +1,4 @@
-import {OFComponent} from "../drivers/openflow";
+import {OFComponent, OFCollection} from "../drivers/openflow";
 import {Hello} from "./core/hello";
 import {Echo} from "./core/echo";
 import {Compose} from "./compose";
@@ -11,7 +11,7 @@ import {Compose} from "./compose";
  * - Returns sources.openflowDriver without `EchoRequest`s
  */
 export const Core: OFComponent = sources => {
-  return Compose([
+  return <{sources: OFCollection, sinks: OFCollection}> Compose([
     Echo,
     Hello,
   ], sources);

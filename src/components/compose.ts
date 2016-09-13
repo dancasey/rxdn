@@ -5,29 +5,27 @@ import {Component, ObservableCollection} from "../interfaces";
  * such that sources output from one component flow as input sources to the next,
  * and sinks from each component are merged as returned as a single sink object.
  */
-export const Compose = <C extends Component, O extends ObservableCollection>(components: C[], sources: O) => {
-  let outSources = sources;
-  let sinks = {} as O;
+export const Compose = <O extends ObservableCollection>(components: Component[], sources: O) => {
+  let nextSources: O = sources;
+  let componentSinks: ObservableCollection;
+  let sinks: ObservableCollection = {};
+  let result: {sources: ObservableCollection, sinks: ObservableCollection};
 
   components.forEach(component => {
-    let result = component(outSources);
-    outSources = result.sources as O;
+    result = component(nextSources);
+    nextSources = result.sources as O;
+    componentSinks = result.sinks;
 
-    // If the key of the sink is in the sinks, merge them.
-    // Otherwise, add it to the sinks object.
-    for (let sink in result.sinks) {
-      if (result.sinks.hasOwnProperty(sink)) {
-        if (sinks.hasOwnProperty(sink)) {
-          sinks[sink].merge(result.sinks[sink]);
-        } else {
-          sinks[sink] = result.sinks[sink];
-        }
+    // For any key of the nextSinks that is in the sinks, merge them.
+    // Otherwise, add the new `key: stream` to sinks
+    for (let sink in componentSinks) {
+      if (sinks.hasOwnProperty(sink)) {
+        sinks[sink] = sinks[sink].merge(componentSinks[sink]);
+      } else {
+        sinks[sink] = componentSinks[sink];
       }
     }
   });
 
-  return {
-    sources: outSources,
-    sinks,
-  };
+  return {sources: nextSources, sinks};
 };

@@ -1,9 +1,11 @@
-import {OFComponent, OFEvent} from "../drivers/openflow";
+import {OFCollection, OFEvent} from "../drivers/openflow";
+import {Component} from "../interfaces";
 import {inspect} from "util";
+
 const show = (item: any) => item ? item instanceof Object ? inspect(item, {colors: true, depth: 4}) : item : "";
 
 /** Sends OpenFlow-related log messages to the console */
-export const OFLog: OFComponent = sources => {
+export const OFLog: Component = (sources: OFCollection) => {
   const log = sources.openflowDriver.map(m => {
     switch (m.event) {
       case OFEvent.Connection:
@@ -17,12 +19,5 @@ export const OFLog: OFComponent = sources => {
         return `Unknown Event ${show(m)}`;
     }
   });
-
-  return {
-    sources,
-    sinks: {
-      consoleDriver: log,
-      openflowDriver: sources.openflowDriver,
-    },
-  };
+  return {sources, sinks: {consoleDriver: log}};
 };

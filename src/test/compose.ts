@@ -42,7 +42,7 @@ test("Passes sources through components", t => {
 
 test("Collects and merges sinks", t => {
   t.plan(3);
-  const r: Observable<any> = result.sinks.mixed
+  const r: Observable<any> = (result.sinks as TestSource).mixed
     .map(val => t.true(typeof val === "string"));
   return r;
 });
