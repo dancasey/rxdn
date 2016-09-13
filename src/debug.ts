@@ -13,6 +13,7 @@ const main: rxdn.OFComponent = src => {
   return <{sources: rxdn.OFCollection, sinks: OFConsoleCollection}> rxdn.Compose([
     rxdn.Core,
     rxdn.Push,
+    rxdn.Hub,
     rxdn.OFLog,
   ], src);
 };

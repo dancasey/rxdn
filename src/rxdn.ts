@@ -3,6 +3,7 @@ export * from "./drivers/openflow";
 export * from "./drivers/console";
 export * from "./components/core";
 export * from "./components/compose";
+export * from "./components/hub";
 export * from "./components/oflog";
 export * from "./components/push";
 export * from "./run";
