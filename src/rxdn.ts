@@ -1,5 +1,6 @@
 export * from "./interfaces";
 export * from "./drivers/openflow";
+export * from "./drivers/state";
 export * from "./drivers/console";
 export * from "./components/core";
 export * from "./components/compose";
