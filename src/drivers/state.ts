@@ -11,7 +11,8 @@ import {Observable} from "rxjs";
  *       .map(value => state => state.set("key", value));
  */
 export const makeStateDriver: <T>(initialState: T) => Driver<T, T> = <T>(initialState: T) =>
-  (sinks: Observable<T>) =>
-    sinks
-      .scan((state: T, changeFn: any) => changeFn(state), initialState)
-      .startWith(initialState);
+  (sink: Observable<T> | undefined) =>
+    sink
+      ? sink.scan((state: T, changeFn: any) => changeFn(state), initialState)
+      : Observable.of(initialState)
+      .share();

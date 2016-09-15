@@ -11,13 +11,30 @@ test("Returns function", t => {
   t.is(typeof d, "function");
 });
 
-test("Updates state", t => {
-  const testValue = {key: "value"};
-  let d = rxdn.makeStateDriver<Object>({});
-  let r = d(Observable.of((state: Object) => Object.assign({}, state, testValue)));
-  if (!r) {
-    t.fail();
+test("Returns initial value", t => {
+  t.plan(1);
+  let stateDriver = rxdn.makeStateDriver({});
+  let runDriver = stateDriver();
+  if (runDriver) {
+    return <Observable<any>> runDriver
+      .map(val => t.deepEqual(val, {}));
   } else {
-    r.map(val => t.deepEqual(val, testValue));
+    t.fail();
+    return;
+  }
+});
+
+test("Updates state", t => {
+  t.plan(1);
+  const testValue = {key: "value"};
+  let stateDriver = rxdn.makeStateDriver({});
+  let runDriver = stateDriver(Observable
+    .of((state: Object) => Object.assign({}, state, testValue)));
+  if (runDriver) {
+    return <Observable<any>> runDriver
+      .map(val => t.deepEqual(val, testValue));
+  } else {
+    t.fail();
+    return;
   }
 });
