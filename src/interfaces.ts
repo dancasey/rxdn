@@ -20,7 +20,7 @@ export interface Component {
  * The Driver is the place to acquire events or data from external sources and to create side-effects.
  */
 export interface Driver<Sink, Source> {
-  (sinks?: Observable<Sink>): void | Observable<Source>;
+  (sink?: Observable<Sink>): void | Observable<Source>;
 }
 
 /** A collection of Drivers indexed by key */
