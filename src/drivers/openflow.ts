@@ -82,35 +82,31 @@ export function makeOpenFlowDriver(options = defaultOptions) {
     server.on("error", (error: Error) => observer.error(error));
   }).share();
 
-  const openFlowDriver: Driver<OpenFlow, OpenFlow> = (sink) => {
+  const openFlowDriver: Driver<OpenFlow, OpenFlow> = sink => {
     // Send outgoing message
     let buffer: Buffer;
-    if (sink) {
-      sink.subscribe({
-        next: outgoing => {
-          // Ignore anything that is not type `Message`
-          if (outgoing.event === OFEvent.Message) {
-            // Get the socket
-            const socket = sockets.get(outgoing.id);
-            if (!socket) {
-              console.error(`openFlowDriver: No socket ${outgoing.id}`);
-              return;
-            }
-            // Try to encode the message
-            try {
-              buffer = outgoing.message.encode();
-              socket.write(buffer);
-            } catch (error) {
-              console.error(`openFlowDriver: Could not encode: ${error}`);
-            }
+    sink.subscribe({
+      next: outgoing => {
+        // Ignore anything that is not type `Message`
+        if (outgoing.event === OFEvent.Message) {
+          // Get the socket
+          const socket = sockets.get(outgoing.id);
+          if (!socket) {
+            console.error(`openFlowDriver: No socket ${outgoing.id}`);
+            return;
           }
-        },
-        error: (err) => server.close(),
-        complete: () => server.close(),
-      });
-    } else {
-      throw new Error("openFlowDriver: No sink given");
-    }
+          // Try to encode the message
+          try {
+            buffer = outgoing.message.encode();
+            socket.write(buffer);
+          } catch (error) {
+            console.error(`openFlowDriver: Could not encode: ${error}`);
+          }
+        }
+      },
+      error: (err) => server.close(),
+      complete: () => server.close(),
+    });
     return source;
   };
   return openFlowDriver;

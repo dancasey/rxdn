@@ -14,7 +14,7 @@ test("Returns function", t => {
 test("Returns initial value", t => {
   t.plan(1);
   let stateDriver = rxdn.makeStateDriver({});
-  let runDriver = stateDriver();
+  let runDriver = stateDriver(Observable.empty());
   if (runDriver) {
     return <Observable<any>> runDriver
       .map(val => t.deepEqual(val, {}));
@@ -32,6 +32,7 @@ test("Updates state", t => {
     .of((state: Object) => Object.assign({}, state, testValue)));
   if (runDriver) {
     return <Observable<any>> runDriver
+      .last()
       .map(val => t.deepEqual(val, testValue));
   } else {
     t.fail();

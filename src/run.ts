@@ -1,4 +1,4 @@
-import {Observable, Subscription, ReplaySubject} from "rxjs";
+import {Subscription, ReplaySubject} from "rxjs";
 import {ObservableCollection, Component, Drivers} from "./interfaces";
 
 interface SubjectCollection {
@@ -17,13 +17,9 @@ function makeProxies(drivers: Drivers): SubjectCollection {
 function callDrivers(drivers: Drivers, proxies: ObservableCollection): ObservableCollection {
   const sources: ObservableCollection = {};
   const names = Object.keys(drivers);
-  let source: void | Observable<any>;
   names.forEach(name => {
-    source = drivers[name](proxies[name]);
-    // only attach result to sources if it is not null
-    if (source) {
-      sources[name] = source;
-    }
+    let source = drivers[name](proxies[name]);
+    sources[name] = source;
   });
   return sources;
 }

@@ -15,12 +15,11 @@ export interface Component {
 }
 
 /**
- * A Driver is a function which *may* accept an Observable (a Sink) and *may* return
- * an Observable (a Source); it should at least do one of these, or it is pointless.
+ * A Driver is a function which takes an Observable (a Sink) and returns an Observable (a Source).
  * The Driver is the place to acquire events or data from external sources and to create side-effects.
  */
 export interface Driver<Sink, Source> {
-  (sink?: Observable<Sink>): void | Observable<Source>;
+  (sink: Observable<Sink>): Observable<Source>;
 }
 
 /** A collection of Drivers indexed by key */

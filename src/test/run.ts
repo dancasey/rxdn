@@ -25,10 +25,10 @@ test("returns a subscription", t => {
 test.cb("connects drivers to main", t => {
   t.plan(1);
   // make a fake driver that checks for the string it injects
-  const driver: rxdn.Driver<string, string> = (sink) => {
+  const driver: rxdn.Driver<string, string> = sink => {
     if (!sink) {
       t.fail();
-      return;
+      throw new Error("No sink");
     }
     // check that the same string came back as a sink
     sink.subscribe(str => {

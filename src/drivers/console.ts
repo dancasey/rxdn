@@ -1,11 +1,11 @@
 import {Driver} from "../interfaces";
+import {Observable} from "rxjs";
 
 /**
- * Logs inputs to the console
+ * Logs sink to the console
  */
-export const consoleDriver: Driver<string, void> = (message) => {
-  if (message) {
-    /* tslint:disable-next-line:no-console */
-    message.subscribe(msg => console.log(msg));
-  }
+export const consoleDriver: Driver<string, void> = sink => {
+  /* tslint:disable-next-line:no-console */
+  sink.subscribe(msg => console.log(msg));
+  return <Observable<any>> Observable.never();
 };
