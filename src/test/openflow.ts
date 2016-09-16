@@ -9,7 +9,7 @@ import {Observable} from "rxjs";
 
 const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;
 
-const CLIENT_DELAY = 100; // setTimeout delay for clients
+const CLIENT_DELAY = 0; // setTimeout delay for clients
 const ERROR_TEST_PORT = 1234;
 const DECODE_TEST_PORT = ERROR_TEST_PORT + 1;
 const ENCODE_TEST_PORT = DECODE_TEST_PORT + 1;
@@ -25,7 +25,6 @@ function errorClient() {
     client.end();
   });
 }
-setTimeout(errorClient, CLIENT_DELAY);
 
 test.cb("exposes errors", t => {
   t.plan(2);
@@ -49,6 +48,7 @@ test.cb("exposes errors", t => {
     subscribeDriver: identityDriver,
   };
   rxdn.run(main, drivers);
+  setTimeout(errorClient, CLIENT_DELAY);
 });
 
 /**
@@ -62,7 +62,6 @@ function decodeClient() {
     client.end();
   });
 }
-setTimeout(decodeClient, CLIENT_DELAY);
 
 test.cb("decodes messages", t => {
   t.plan(1);
@@ -87,6 +86,7 @@ test.cb("decodes messages", t => {
     subscribeDriver: identityDriver,
   };
   rxdn.run(main, drivers);
+  setTimeout(decodeClient, CLIENT_DELAY);
 });
 
 /**
