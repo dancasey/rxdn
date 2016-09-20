@@ -1,12 +1,7 @@
-/**
- * OpenFlow driver
- */
-
 import {OpenFlowMessage, decode} from "node-openflow";
 import {Driver, ObservableCollection} from "../interfaces";
 import {createServer, Socket, ListenOptions} from "net";
 import {Observable, Observer} from "rxjs";
-
 
 export enum OFEvent {
   Connection,
@@ -43,7 +38,7 @@ export const socketId = (socket: Socket): string => {
 /**
  * OpenFlow driver
  * @param {ListenOptions} [options=defaultOptions] Server options for net.Server
- * @return {function} openFlowDriver
+ * @return {Driver<OpenFlow, OpenFlow>} openFlowDriver
  */
 export function makeOpenFlowDriver(options = defaultOptions) {
   const sockets: Map<string, Socket> = new Map();
