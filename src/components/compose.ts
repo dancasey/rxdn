@@ -1,15 +1,15 @@
-import {Component, ObservableCollection} from "../interfaces";
+import {Component, Collection} from "../interfaces";
 
 /**
  * Takes an array of components and a sources object and composes the components
  * such that sources output from one component flow as input sources to the next,
  * and sinks from each component are merged as returned as a single sink object.
  */
-export const Compose = <O extends ObservableCollection>(components: Component[], sources: O) => {
+export const Compose = <O extends Collection>(components: Component[], sources: O) => {
   let nextSources: O = sources;
-  let componentSinks: ObservableCollection;
-  let sinks: ObservableCollection = {};
-  let result: {sources: ObservableCollection, sinks: ObservableCollection};
+  let componentSinks: Collection;
+  let sinks: Collection = {};
+  let result: {sources: Collection, sinks: Collection};
 
   components.forEach(component => {
     result = component(nextSources);

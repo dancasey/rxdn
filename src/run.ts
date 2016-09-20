@@ -1,5 +1,5 @@
 import {Subscription, ReplaySubject} from "rxjs";
-import {ObservableCollection, Component, Drivers} from "./interfaces";
+import {Collection, Component, Drivers} from "./interfaces";
 
 interface SubjectCollection {
   [name: string]: ReplaySubject<any>;
@@ -14,8 +14,8 @@ function makeProxies(drivers: Drivers): SubjectCollection {
   return proxies;
 }
 
-function callDrivers(drivers: Drivers, proxies: ObservableCollection): ObservableCollection {
-  const sources: ObservableCollection = {};
+function callDrivers(drivers: Drivers, proxies: Collection): Collection {
+  const sources: Collection = {};
   const names = Object.keys(drivers);
   names.forEach(name => {
     let source = drivers[name](proxies[name]);
@@ -24,7 +24,7 @@ function callDrivers(drivers: Drivers, proxies: ObservableCollection): Observabl
   return sources;
 }
 
-function subscribeAll(sinks: ObservableCollection, proxies: SubjectCollection): Subscription {
+function subscribeAll(sinks: Collection, proxies: SubjectCollection): Subscription {
   const subscription = new Subscription();
   const names = Object.keys(sinks);
   names.forEach(name => {

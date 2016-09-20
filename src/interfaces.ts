@@ -1,17 +1,17 @@
 import {Observable} from "rxjs";
 
 /** A collection of Observables indexed by key */
-export interface ObservableCollection {
+export interface Collection {
   [name: string]: Observable<any>;
 }
 
 /**
- * A Component is a function which accepts a source of Observables indexed by key (an ObservableCollection)
+ * A Component is a function which accepts a source of Observables indexed by key (a Collection)
  * and returns sources as inputs to composed Components and sinks as inputs to Drivers.
  * A Component should not create side-effects, as this is the function of a Driver.
  */
 export interface Component {
-  (sources: ObservableCollection): {sources: ObservableCollection, sinks: ObservableCollection};
+  (sources: Collection): {sources: Collection, sinks: Collection};
 }
 
 /**

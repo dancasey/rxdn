@@ -1,5 +1,5 @@
 import {OpenFlowMessage, decode} from "node-openflow";
-import {Driver, ObservableCollection} from "../interfaces";
+import {Driver, Collection} from "../interfaces";
 import {createServer, Socket, ListenOptions} from "net";
 import {Observable, Observer} from "rxjs";
 
@@ -16,7 +16,7 @@ export type OpenFlow =
   {id: string, event: OFEvent.Error, error: Error} |
   {id: string, event: OFEvent.Message, message: OpenFlowMessage};
 
-export interface OFCollection extends ObservableCollection {
+export interface OFCollection extends Collection {
   openflowDriver: Observable<OpenFlow>;
 }
 

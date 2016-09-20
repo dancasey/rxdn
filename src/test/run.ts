@@ -13,7 +13,7 @@ const identityMain: rxdn.Component = sources => ({sinks: sources, sources});
 const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;
 const testDriver: rxdn.Driver<void, string> = () => Observable.of(testString);
 
-interface TestSources extends rxdn.ObservableCollection {
+interface TestSources extends rxdn.Collection {
   testDriver: Observable<string>;
 }
 
