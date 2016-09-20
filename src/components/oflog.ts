@@ -1,4 +1,4 @@
-import {OFCollection, OFEvent} from "../drivers/openflow";
+import {OFCollection, OFEventType} from "../drivers/openflow";
 import {Component} from "../interfaces";
 import {inspect} from "util";
 
@@ -8,13 +8,13 @@ const show = (item: any) => item ? item instanceof Object ? inspect(item, {color
 export const OFLog: Component = (sources: OFCollection) => {
   const log = sources.openflowDriver.map(m => {
     switch (m.event) {
-      case OFEvent.Connection:
-      case OFEvent.Disconnection:
-        return `${show(OFEvent[m.event])} from ${show(m.id)}`;
-      case OFEvent.Error:
-        return `${show(OFEvent[m.event])} from ${show(m.id)}: ${show(m.error)}`;
-      case OFEvent.Message:
-        return `${show(OFEvent[m.event])} from ${show(m.id)}: ${show(m.message)}`;
+      case OFEventType.Connection:
+      case OFEventType.Disconnection:
+        return `${show(OFEventType[m.event])} from ${show(m.id)}`;
+      case OFEventType.Error:
+        return `${show(OFEventType[m.event])} from ${show(m.id)}: ${show(m.error)}`;
+      case OFEventType.Message:
+        return `${show(OFEventType[m.event])} from ${show(m.id)}: ${show(m.message)}`;
       default:
         return `Unknown Event ${show(m)}`;
     }

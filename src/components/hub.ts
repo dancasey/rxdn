@@ -1,11 +1,11 @@
-import {OFComponent, OFEvent, OpenFlow} from "../drivers/openflow";
+import {OFComponent, OFEventType, OFEvent} from "../drivers/openflow";
 import * as OF from "node-openflow";
 
 /** Responds to PacketIn with PacketOut which floods */
 export const Hub: OFComponent = sources => {
   const packetout = sources.openflowDriver
-    .filter(m => m.event === OFEvent.Message && m.message.name === "ofp_packet_in")
-    .map((m: {id: string, event: OFEvent.Message, message: OF.PacketIn}) => {
+    .filter(m => m.event === OFEventType.Message && m.message.name === "ofp_packet_in")
+    .map((m: {id: string, event: OFEventType.Message, message: OF.PacketIn}) => {
       // Build the Action to send flows to the controller
       let action = new OF.Action();
       action.type = OF.ofp_action_type[OF.OFPAT_OUTPUT];
@@ -27,8 +27,8 @@ export const Hub: OFComponent = sources => {
         po.message.buffer_id = m.message.message.buffer_id;
       }
 
-      return <OpenFlow> {
-        event: OFEvent.Message,
+      return <OFEvent> {
+        event: OFEventType.Message,
         id: m.id,
         message: po,
       };

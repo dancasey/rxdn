@@ -9,11 +9,11 @@ test("Floods packets", t => {
 
   const openflowDriver = Observable.of({
     id: "1.2.3.4:1111",
-    event: rxdn.OFEvent.Message,
+    event: rxdn.OFEventType.Message,
     message: pi,
-  } as rxdn.OpenFlow);
+  } as rxdn.OFEvent);
   return <Observable<any>> rxdn.Hub({openflowDriver}).sinks.openflowDriver
-    .map((m: {id: string, event: rxdn.OFEvent.Message, message: rxdn.PacketOut}) => {
+    .map((m: {id: string, event: rxdn.OFEventType.Message, message: rxdn.PacketOut}) => {
       t.is(m.message.name, "ofp_packet_out");
       t.is(m.message.message.data, pi.data);
     });

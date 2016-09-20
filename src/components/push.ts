@@ -1,11 +1,11 @@
-import {OFComponent, OFEvent, OpenFlow} from "../drivers/openflow";
+import {OFComponent, OFEventType, OFEvent} from "../drivers/openflow";
 import * as OF from "node-openflow";
 
 /** Installs FlowMod to push all new flows to controller */
 export const Push: OFComponent = sources => {
   const flowmod = sources.openflowDriver
-    .filter(m => m.event === OFEvent.Message && m.message.name === "ofp_hello")
-    .map((m: {id: string, event: OFEvent.Message, message: OF.Hello}) => {
+    .filter(m => m.event === OFEventType.Message && m.message.name === "ofp_hello")
+    .map((m: {id: string, event: OFEventType.Message, message: OF.Hello}) => {
       // Build the Action to send flows to the controller
       let action = new OF.Action();
 
@@ -35,8 +35,8 @@ export const Push: OFComponent = sources => {
       fm.message.priority = 0;
       fm.message.instructions.push(ins);
 
-      return <OpenFlow> {
-        event: OFEvent.Message,
+      return <OFEvent> {
+        event: OFEventType.Message,
         id: m.id,
         message: fm,
       };
