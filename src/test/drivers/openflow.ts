@@ -4,7 +4,7 @@
  */
 import test, {ContextualCallbackTestContext} from "ava";
 import * as net from "net";
-import * as rxdn from "../rxdn";
+import * as rxdn from "../../rxdn";
 import {Observable} from "rxjs";
 
 const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;

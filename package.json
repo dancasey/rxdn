@@ -29,7 +29,7 @@
   ],
   "ava": {
     "files": [
-      "dist/test/*.js"
+      "dist/test"
     ],
     "verbose": true
   },
@@ -37,6 +37,11 @@
     "exclude": [
       "node_modules",
       "dist/test"
+    ],
+    "reporter": [
+      "text",
+      "text-summary",
+      "html"
     ]
   },
   "engines": {

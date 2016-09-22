@@ -4,7 +4,7 @@
 
 /* tslint:disable:no-string-literals */
 import test from "ava";
-import * as rxdn from "../rxdn";
+import * as rxdn from "../../rxdn";
 import {Observable} from "rxjs";
 
 interface TestSource extends rxdn.Collection {
