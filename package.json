@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "pretest": "npm run build",
-    "test": "ava",
+    "test": "nyc ava",
     "prepublish": "npm run build",
     "debug": "node dist/debug.js"
   },
@@ -33,6 +33,12 @@
     ],
     "verbose": true
   },
+  "nyc": {
+    "exclude": [
+      "node_modules",
+      "dist/test"
+    ]
+  },
   "engines": {
     "node": "6"
   },
@@ -40,6 +46,7 @@
   "devDependencies": {
     "@types/node": "^6.0.32",
     "ava": "^0.16.0",
+    "nyc": "^8.3.0",
     "typescript": "^2.0.0"
   },
   "dependencies": {
