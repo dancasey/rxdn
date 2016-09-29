@@ -58,7 +58,7 @@
     "typescript": "^2.0.0"
   },
   "dependencies": {
-    "node-openflow": "file:///Users/dan/code/grind/node-openflow-1.0.0.tgz",
+    "node-openflow": "github:dancasey/node-openflow",
     "rxjs": "^5.0.0-beta.11"
   }
 }
