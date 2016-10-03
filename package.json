@@ -58,6 +58,7 @@
     "typescript": "^2.0.0"
   },
   "dependencies": {
+    "ethernet": "^1.0.1",
     "node-openflow": "github:dancasey/node-openflow",
     "rxjs": "^5.0.0-beta.11"
   }

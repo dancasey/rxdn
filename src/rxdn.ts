@@ -7,5 +7,6 @@ export * from "./components/compose";
 export * from "./components/hub";
 export * from "./components/oflog";
 export * from "./components/push";
+export * from "./components/switch";
 export * from "./run";
 export * from "node-openflow";
