@@ -30,12 +30,8 @@ export interface SMComponent {
  *
  */
 export const SwitchMemory: SMComponent = sources => {
-  // PacketIn messages
-  const packetIn = sources.openflowDriver
-    .filter(m => m.event === OFEventType.Message && m.message.name === "ofp_packet_in");
-
   // Source MAC address, switch id, and switch port
-  const source = packetIn
+  const source = sources.openflowDriver
     .map((m: {id: string, event: OFEventType.Message, message: OF.PacketIn}) => {
       let oxm = m.message.message.match.getOxm("OFPXMT_OFB_IN_PORT");
       let srcport = -1;
