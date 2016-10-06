@@ -7,6 +7,9 @@ import * as OF from "node-openflow";
 /** How long should switch remember flows (ms) */
 const FORGET = 30 * 1000;
 
+/** An OFEvent that is always a PacketIn Message */
+export type PIEvent = {id: string, event: OFEventType.Message, message: OF.PacketIn};
+
 export interface SMEvent {
   id: string;
   srcport: number;
@@ -32,7 +35,7 @@ export interface SMComponent {
 export const SwitchMemory: SMComponent = sources => {
   // Source MAC address, switch id, and switch port
   const source = sources.openflowDriver
-    .map((m: {id: string, event: OFEventType.Message, message: OF.PacketIn}) => {
+    .map((m: PIEvent) => {
       let oxm = m.message.message.match.getOxm("OFPXMT_OFB_IN_PORT");
       let srcport = -1;
       if (oxm) { srcport = parseInt(oxm.oxm_value, 10); }
