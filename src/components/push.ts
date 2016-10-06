@@ -1,6 +1,12 @@
 import {OFComponent, OFEventType, OFEvent} from "../drivers/openflow";
 import * as OF from "node-openflow";
 
+// Length of Ethernet header
+const ETH_LEN = 14;
+
+// Priority level of this rule
+const PRIORITY = 0;
+
 /** Installs FlowMod to push all new flows to controller */
 export const Push: OFComponent = sources => {
   const flowmod = sources.openflowDriver
@@ -18,7 +24,9 @@ export const Push: OFComponent = sources => {
       action.port = OF.OFPP_CONTROLLER;
 
       // Send the whole packet to the controller instead of buffering it
-      action.max_len = OF.OFPCML_NO_BUFFER;
+      // action.max_len = OF.OFPCML_NO_BUFFER;
+      // Send only the Ethernet header
+      action.max_len = ETH_LEN;
 
       // Build the instruction to apply the Action
       let ins = new OF.Instruction();
@@ -32,7 +40,7 @@ export const Push: OFComponent = sources => {
       fm.message.out_port = OF.OFPP_ANY;
       fm.message.out_group = OF.OFPG_ANY;
       fm.message.flags = [];
-      fm.message.priority = 0;
+      fm.message.priority = PRIORITY;
       fm.message.instructions.push(ins);
 
       return <OFEvent> {
