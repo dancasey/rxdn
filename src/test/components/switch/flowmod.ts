@@ -1,4 +1,5 @@
 import test from "ava";
+import * as R from "ramda";
 import * as rxdn from "../../../rxdn";
 import {Observable} from "rxjs";
 // Separately import FlowMod as it is not exported directly
@@ -59,6 +60,15 @@ act.max_len = rxdn.OFPCML_NO_BUFFER;
 ins.actions.push(act);
 fm.message.instructions.push(ins);
 
+const props = {
+  hardTimeout: 22,
+  idleTimeout: 23,
+  priority: 24,
+};
+let fmProps = R.clone(fm);
+fmProps.message.hard_timeout = props.hardTimeout;
+fmProps.message.idle_timeout = props.idleTimeout;
+fmProps.message.priority = props.priority;
 
 /* tests */
 
@@ -72,5 +82,22 @@ test("Creates the corresponding FlowMod", t => {
   };
 
   return <Observable<any>> FlowMod({openflowDriver: packetIn00, switchMemory: sm00}).sinks.openflowDriver
+    .map(m => t.deepEqual(m, expecting));
+});
+
+test("Adjusts timeouts based on props", t => {
+  t.plan(1);
+
+  const expecting: rxdn.OFEvent = {
+    id: "1.1.1.1:1234",
+    event: rxdn.OFEventType.Message,
+    message: fmProps,
+  };
+
+  return <Observable<any>> FlowMod({
+    openflowDriver: packetIn00,
+    switchMemory: sm00,
+    props: Observable.of(props),
+  }).sinks.openflowDriver
     .map(m => t.deepEqual(m, expecting));
 });

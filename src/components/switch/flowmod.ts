@@ -27,8 +27,10 @@ export type FlowModSources = OFCollection & SMCollection & {props?: Observable<F
 export const FlowMod = (sources: FlowModSources) => {
   let props: Observable<FlowModProps>;
   if (sources.props) {
-    props = Observable.merge(defaultProps, sources.props, (d: Observable<FlowModProps>, s: Observable<FlowModProps>) =>
-      Object.assign({}, d, s));
+    props = sources.props.withLatestFrom(
+      defaultProps,
+      (s: Observable<FlowModProps>, d: Observable<FlowModProps>) =>
+      Object.assign(<FlowModProps> {}, d, s));
   } else {
     props = defaultProps;
   }

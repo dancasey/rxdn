@@ -3,8 +3,6 @@ import {Observable} from "rxjs";
 import ethdecode from "ethernet";
 import * as OF from "node-openflow";
 
-
-
 /**
  * Configurable properties:
  * - timeout: How long should switch remember flows (ms)
@@ -45,9 +43,11 @@ export interface SMComponent {
 export const SwitchMemory: SMComponent = (sources: OFCollection & {props?: Observable<SwitchMemoryProps>}) => {
   let props: Observable<SwitchMemoryProps>;
   if (sources.props instanceof Observable) {
-    props = Observable
-      .merge(defaultProps, sources.props, (d: Observable<SwitchMemoryProps>, s: Observable<SwitchMemoryProps>) =>
-        Object.assign({}, d, s));
+    props = sources.props.withLatestFrom(
+      defaultProps,
+      (s: Observable<SwitchMemoryProps>, d: Observable<SwitchMemoryProps>) =>
+        Object.assign(<SwitchMemoryProps> {}, d, s)
+    );
   } else {
     props = defaultProps;
   }

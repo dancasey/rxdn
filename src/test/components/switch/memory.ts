@@ -77,8 +77,10 @@ const packetIn02 = Observable.of(<rxdn.OFEvent> {
 });
 
 // Make sure to delay second packetIn, or memory will have all the `dstport`s immediately
-const twoPackets: Observable<rxdn.OFEvent> = Observable.concat(packetIn01, packetIn02.delay(50));
-
+const twoPackets: Observable<rxdn.OFEvent> =
+  Observable.concat(packetIn01, packetIn02.delay(50));
+const threePackets: Observable<rxdn.OFEvent> =
+  Observable.concat(packetIn01, packetIn02.delay(50), packetIn01.delay(1000));
 
 /* tests */
 
@@ -119,6 +121,37 @@ test("Matches dstport in memory", t => {
     dstmac: "0a0b0c0d0e0f",
   }];
   return <Observable<any>> SwitchMemory({openflowDriver: twoPackets}).sources.switchMemory
+    .reduce((acc, val) => { acc.push(val); return acc; }, <SMEvent[]> new Array())
+    .map(m => t.deepEqual(m, expecting));
+});
+
+test("Forgets after timeout specified via props", t => {
+  t.plan(1);
+  const expecting: SMEvent[] = [{
+    id: "1.1.1.1:1234",
+    srcport: 10,
+    dstport: -1,
+    srcmac: "0a0b0c0d0e0f",
+    dstmac: "010203040506",
+  },
+  {
+    id: "1.1.1.1:1234",
+    srcport: 20,
+    dstport: 10,
+    srcmac: "010203040506",
+    dstmac: "0a0b0c0d0e0f",
+  },
+  {
+    id: "1.1.1.1:1234",
+    srcport: 10,
+    dstport: -1,
+    srcmac: "0a0b0c0d0e0f",
+    dstmac: "010203040506",
+  }];
+  return <Observable<any>> SwitchMemory({
+    openflowDriver: threePackets,
+    props: Observable.of({timeout: 500}),
+  }).sources.switchMemory
     .reduce((acc, val) => { acc.push(val); return acc; }, <SMEvent[]> new Array())
     .map(m => t.deepEqual(m, expecting));
 });
