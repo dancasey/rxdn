@@ -2,7 +2,7 @@ import {OFCollection, OFEventType} from "../drivers/openflow";
 import {Component} from "../interfaces";
 import {inspect} from "util";
 
-const show = (item: any) => item ? item instanceof Object ? inspect(item, {colors: true, depth: 4}) : item : "";
+const show = (item: any) => item instanceof Object ? inspect(item, {colors: true, depth: 4}) : item;
 
 /** Sends OpenFlow-related log messages to the console */
 export const OFLog: Component = (sources: OFCollection) => {
