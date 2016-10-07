@@ -3,24 +3,48 @@ import {PIEvent, SMEvent, SMCollection} from "./memory";
 import {Observable} from "rxjs";
 import * as OF from "node-openflow";
 
-const HARD_TIMEOUT = 10;
-const IDLE_TIMEOUT = 5;
-const PRIORITY = 10;
+/**
+ * Configurable properties:
+ * - hardTimeout: seconds after which rule will be removed by switch
+ * - idleTimeout: seconds after which unused rule will be removed by switch
+ * - priority: priority level of rule: higher number equals higher priority
+ */
+export interface FlowModProps {
+  hardTimeout: number;
+  idleTimeout: number;
+  priority: number;
+}
+
+const defaultProps: Observable<FlowModProps> = Observable.of({
+  hardTimeout: 10,
+  idleTimeout: 5,
+  priority: 10,
+});
+
+export type FlowModSources = OFCollection & SMCollection & {props?: Observable<FlowModProps>};
 
 /** Sends FlowMod to source switch, referencing `buffer_id` of PacketIn */
-export const FlowMod = (sources: OFCollection & SMCollection) => {
+export const FlowMod = (sources: FlowModSources) => {
+  let props: Observable<FlowModProps>;
+  if (sources.props) {
+    props = Observable.merge(defaultProps, sources.props, (d: Observable<FlowModProps>, s: Observable<FlowModProps>) =>
+      Object.assign({}, d, s));
+  } else {
+    props = defaultProps;
+  }
 
   const flowmod: Observable<OFEvent> = Observable
     .zip(sources.openflowDriver, sources.switchMemory)
-    .map(([pi, sm]: [PIEvent, SMEvent]) => {
+    .withLatestFrom(props, ([pi, sm], p) => [pi, sm, p])
+    .map(([pi, sm, p]: [PIEvent, SMEvent, FlowModProps]) => {
       let fm = new OF.FlowMod();
       fm.message.header.xid = pi.message.message.header.xid;
       fm.message.buffer_id = pi.message.message.buffer_id;
       fm.commandVal = OF.OFPFC_ADD;
       fm.flagsVal = OF.OFPFF_SEND_FLOW_REM;
-      fm.message.hard_timeout = HARD_TIMEOUT;
-      fm.message.idle_timeout = IDLE_TIMEOUT;
-      fm.message.priority = PRIORITY;
+      fm.message.hard_timeout = p.hardTimeout;
+      fm.message.idle_timeout = p.idleTimeout;
+      fm.message.priority = p.priority;
 
       let ma = new OF.Match();
       ma.oxm_fields.push(new OF.Oxm({
@@ -49,7 +73,7 @@ export const FlowMod = (sources: OFCollection & SMCollection) => {
     });
 
   return {
-    sources: {openflowDriver: sources.openflowDriver},
+    sources,
     sinks: {openflowDriver: flowmod},
   };
 };

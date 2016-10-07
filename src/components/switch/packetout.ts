@@ -72,11 +72,15 @@ export const PacketOut: SMComponent = (sources: OFCollection & SMCollection) => 
   const flowModPI = knownDest.map(([pi]: [PIEvent, SMEvent]) => pi);
   const flowModSM = knownDest.map(([, sm]: [PIEvent, SMEvent]) => sm);
 
-  // Sinks
-  const packetOut = Observable.merge(packetOutFlood, packetOutDirect);
+  // Outputs
+  const outSources = Object.assign({}, sources, {
+    openflowDriver: flowModPI,
+    switchMemory: flowModSM,
+  });
+  const sinks = {openflowDriver: Observable.merge(packetOutFlood, packetOutDirect)};
 
   return {
-    sources: {openflowDriver: flowModPI, switchMemory: flowModSM},
-    sinks: {openflowDriver: packetOut},
+    sources: outSources,
+    sinks,
   };
 };
