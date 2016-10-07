@@ -50,6 +50,7 @@
   "private": true,
   "devDependencies": {
     "@types/node": "^6.0.32",
+    "@types/ramda": "0.0.2",
     "ava": "^0.16.0",
     "nyc": "^8.3.0",
     "typescript": "^2.0.0"
@@ -58,6 +59,7 @@
     "ethernet": "^1.0.1",
     "node-openflow": "github:dancasey/node-openflow",
     "postinstall-build": "^2.1.2",
+    "ramda": "^0.22.1",
     "rxjs": "^5.0.0-beta.11"
   }
 }
