@@ -10,4 +10,4 @@ export * from "./drivers/console";
 export * from "./drivers/openflow";
 export * from "./drivers/state";
 export * from "./run";
-export * from "node-openflow";
+export * from "@dancasey/node-openflow";

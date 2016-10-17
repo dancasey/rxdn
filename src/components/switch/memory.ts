@@ -1,7 +1,7 @@
 import {OFEventType, OFCollection} from "../../drivers/openflow";
 import {Observable} from "rxjs";
 import ethdecode from "ethernet";
-import * as OF from "node-openflow";
+import * as OF from "@dancasey/node-openflow";
 
 /**
  * Configurable properties:

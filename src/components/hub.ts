@@ -1,5 +1,5 @@
 import {OFComponent, OFEventType, OFEvent} from "../drivers/openflow";
-import * as OF from "node-openflow";
+import * as OF from "@dancasey/node-openflow";
 
 /** Responds to PacketIn with PacketOut which floods */
 export const Hub: OFComponent = sources => {

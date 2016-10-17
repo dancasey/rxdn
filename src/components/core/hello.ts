@@ -1,5 +1,5 @@
 import {OFComponent, OFEventType, OFEvent} from "../../drivers/openflow";
-import * as OF from "node-openflow";
+import * as OF from "@dancasey/node-openflow";
 
 /** Sends a Hello message upon connection */
 export const Hello: OFComponent = sources => {

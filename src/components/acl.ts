@@ -1,6 +1,6 @@
 import {OFCollection, OFComponent, OFEvent, OFEventType} from "../drivers/openflow";
 import {Observable} from "rxjs";
-import * as OF from "node-openflow";
+import * as OF from "@dancasey/node-openflow";
 import ethdecode from "ethernet";
 import * as R from "ramda";
 

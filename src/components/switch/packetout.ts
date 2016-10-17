@@ -1,7 +1,7 @@
 import {OFCollection, OFEvent, OFEventType} from "../../drivers/openflow";
 import {PIEvent, SMEvent, SMCollection, SMComponent} from "./memory";
 import {Observable} from "rxjs";
-import * as OF from "node-openflow";
+import * as OF from "@dancasey/node-openflow";
 
 /**
  * PacketOut

@@ -1,5 +1,5 @@
 import {OFComponent, OFEventType, OFEvent} from "../../drivers/openflow";
-import * as OF from "node-openflow";
+import * as OF from "@dancasey/node-openflow";
 
 /** Replies to EchoRequest messages and removes them from outgoing sources */
 export const Echo: OFComponent = sources => {

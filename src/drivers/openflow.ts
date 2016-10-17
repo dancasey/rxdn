@@ -1,4 +1,4 @@
-import * as OF from "node-openflow";
+import * as OF from "@dancasey/node-openflow";
 import {Driver, Collection} from "../interfaces";
 import {createServer, Socket, ListenOptions} from "net";
 import {Observable, Observer} from "rxjs";
