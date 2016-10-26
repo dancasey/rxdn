@@ -19,9 +19,9 @@ c4710800139a2a34000057e4247f0007\
 262728292a2b2c2d2e2f303132333435\
 3637";
 
-let pi00 = new rxdn.PacketIn();
+let pi00 = new rxdn.of13.PacketIn();
 pi00.data = frame00;
-pi00.message.match.oxm_fields.push(new rxdn.Oxm({
+pi00.message.match.oxm_fields.push(new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "5",
 }));
@@ -40,23 +40,23 @@ const sm00: Observable<SMEvent> = Observable.of({
   dstmac: "665544332211",
 });
 
-let fm = new rxdn.FlowMod();
+let fm = new rxdn.of13.FlowMod();
 fm.message.idle_timeout = 5;
 fm.message.hard_timeout = 10;
 fm.message.priority = 10;
 fm.message.buffer_id = 0;
-fm.flagsVal = rxdn.OFPFF_SEND_FLOW_REM;
+fm.flagsVal = rxdn.of13.OFPFF_SEND_FLOW_REM;
 
-let match = new rxdn.Match();
-match.oxm_fields.push(new rxdn.Oxm({oxm_field: "OFPXMT_OFB_ETH_DST", oxm_value: "665544332211"}));
+let match = new rxdn.of13.Match();
+match.oxm_fields.push(new rxdn.of13.Oxm({oxm_field: "OFPXMT_OFB_ETH_DST", oxm_value: "665544332211"}));
 fm.message.match = match;
 
-let ins = new rxdn.Instruction();
-ins.typeVal = rxdn.OFPIT_APPLY_ACTIONS;
-let act = new rxdn.Action();
-act.typeVal = rxdn.OFPAT_OUTPUT;
+let ins = new rxdn.of13.Instruction();
+ins.typeVal = rxdn.of13.OFPIT_APPLY_ACTIONS;
+let act = new rxdn.of13.Action();
+act.typeVal = rxdn.of13.OFPAT_OUTPUT;
 act.port = 55;
-act.max_len = rxdn.OFPCML_NO_BUFFER;
+act.max_len = rxdn.of13.OFPCML_NO_BUFFER;
 ins.actions.push(act);
 fm.message.instructions.push(ins);
 

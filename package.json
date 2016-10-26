@@ -1,13 +1,11 @@
 {
   "name": "@dancasey/rxdn",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Reactively Defined Networking (rxdn)",
   "main": "dist/rxdn.js",
   "scripts": {
-    "build": "tsc",
-    "pretest": "npm run build",
     "test": "nyc ava",
-    "prepublish": "npm run build"
+    "prepublish": "tsc"
   },
   "author": "Dan Casey <dc181@icloud.com> (https://github.com/dancasey)",
   "license": "PDDL-1.0",
@@ -44,7 +42,7 @@
     ]
   },
   "engines": {
-    "node": "6"
+    "node": ">=6"
   },
   "devDependencies": {
     "@types/node": "^6.0.32",
@@ -54,7 +52,7 @@
     "typescript": "^2.0.0"
   },
   "dependencies": {
-    "@dancasey/node-openflow": "^0.1.0",
+    "@dancasey/node-openflow": "^0.2.1",
     "ethernet": "^1.0.1",
     "ramda": "^0.22.1",
     "rxjs": "^5.0.0-rc.1"

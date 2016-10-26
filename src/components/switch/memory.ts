@@ -1,7 +1,7 @@
 import {OFEventType, OFCollection} from "../../drivers/openflow";
 import {Observable} from "rxjs";
 import ethdecode from "ethernet";
-import * as OF from "@dancasey/node-openflow";
+import {of13} from "@dancasey/node-openflow";
 
 /**
  * Configurable properties:
@@ -16,7 +16,7 @@ const defaultProps: Observable<SwitchMemoryProps> = Observable.of({
 });
 
 /** An OFEvent that is always a PacketIn Message */
-export type PIEvent = {id: string, event: OFEventType.Message, message: OF.PacketIn};
+export type PIEvent = {id: string, event: OFEventType.Message, message: of13.PacketIn};
 
 export interface SMEvent {
   id: string;

@@ -4,12 +4,13 @@ import {SwitchMemory, SwitchMemoryProps} from "./switch/memory";
 import {PacketOut} from "./switch/packetout";
 import {FlowMod, FlowModProps} from "./switch/flowmod";
 import {Observable} from "rxjs";
+import {of13} from "@dancasey/node-openflow";
 
 type SwitchProps = SwitchMemoryProps & FlowModProps;
 type SwitchSources = OFCollection & {props?: Observable<SwitchProps>};
 
 /**
- * Layer 2 Switch
+ * Layer 2 Switch, OpenFlow 1.3
  *
  * 1. Accepts PacketIn messages
  * 2. (Temporarily) memorizes source switch, source port, and MAC address of each PacketIn
@@ -22,7 +23,10 @@ type SwitchSources = OFCollection & {props?: Observable<SwitchProps>};
 export const Switch: OFComponent = (sources: SwitchSources) => {
   // PacketIn messages
   const packetIn = sources.openflowDriver
-    .filter(m => m.event === OFEventType.Message && m.message.name === "ofp_packet_in");
+    .filter(m =>
+      m.event === OFEventType.Message &&
+      m.message.name === "ofp_packet_in" &&
+      m.message.message.header.version === of13.OFP_VERSION);
 
   const outSources = Object.assign({}, sources, {openflowDriver: packetIn});
 

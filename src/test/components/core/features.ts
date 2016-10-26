@@ -6,7 +6,7 @@ test("Sends `FeaturesRequest` on session establishment", t => {
   const openflowDriver = Observable.of({
     id: "1.1.1.1:1234",
     event: rxdn.OFEventType.Message,
-    message: new rxdn.Hello(),
+    message: new rxdn.of13.Hello(),
   } as rxdn.OFEvent);
   const result: Observable<any> = rxdn.Core({openflowDriver}).sinks.openflowDriver
     .map((m: {id: string, event: rxdn.OFEventType.Message, message: rxdn.OpenFlowMessage}) =>
@@ -18,7 +18,7 @@ test("Removes `FeaturesReply` from sources", t => {
   const openflowDriver = Observable.of({
     id: "1.1.1.1:1234",
     event: rxdn.OFEventType.Message,
-    message: new rxdn.FeaturesReply(),
+    message: new rxdn.of13.FeaturesReply(),
   } as rxdn.OFEvent);
   const result: Observable<any> = rxdn.Core({openflowDriver}).sources.openflowDriver
     .map((m: {id: string, event: rxdn.OFEventType.Message, message: rxdn.OpenFlowMessage}) =>
@@ -30,11 +30,11 @@ test("Does not remove other messages from sources", t => {
   const openflowDriver = Observable.of({
     id: "1.1.1.1:1234",
     event: rxdn.OFEventType.Message,
-    message: new rxdn.Hello(),
+    message: new rxdn.of13.Hello(),
   } as rxdn.OFEvent);
   const result: Observable<any> = rxdn.Core({openflowDriver}).sources.openflowDriver
     .map((m: {id: string, event: rxdn.OFEventType.Message, message: rxdn.OpenFlowMessage}) =>
-      t.true(m.message instanceof rxdn.Hello));
+      t.true(m.message instanceof rxdn.of13.Hello));
   return result;
 });
 

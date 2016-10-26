@@ -1,6 +1,6 @@
 import {OFCollection, OFComponent, OFEvent, OFEventType} from "../drivers/openflow";
 import {Observable} from "rxjs";
-import * as OF from "@dancasey/node-openflow";
+import {of10, of13} from "@dancasey/node-openflow";
 import ethdecode from "ethernet";
 import * as R from "ramda";
 
@@ -14,18 +14,24 @@ export interface AclProps {
 
 export type AclSources = OFCollection & {props: Observable<AclProps>};
 
+const filterAcl = (data: string, acl: string[]): boolean => {
+    const {source, destination} = ethdecode(data);
+    if (R.contains(source, acl) || R.contains(destination, acl)) {
+      return false;
+    } else {
+      return true;
+    }
+};
+
 /** Applies Access Control List (ACL) as a filter to incoming frames */
 export const Acl: OFComponent = (sources: AclSources) => {
   const filtered = sources.openflowDriver
     .withLatestFrom(sources.props)
     .filter(([m, props]: [OFEvent, AclProps]) => {
-      if (m.event === OFEventType.Message && m.message instanceof OF.PacketIn) {
-        const {source, destination} = ethdecode(m.message.message.data);
-        if (R.contains(source, props.acl) || R.contains(destination, props.acl)) {
-          return false;
-        } else {
-          return true;
-        }
+      if (m.event === OFEventType.Message && m.message instanceof of13.PacketIn) {
+        return filterAcl(m.message.message.data, props.acl);
+      } else if (m.event === OFEventType.Message && m.message instanceof of10.PacketIn) {
+        return filterAcl(m.message.message.data, props.acl);
       } else {
         return true;
       }

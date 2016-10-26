@@ -15,9 +15,9 @@ c4710800139a2a34000057e4247f0007\
 262728292a2b2c2d2e2f303132333435\
 3637";
 
-let pi00 = new rxdn.PacketIn();
+let pi00 = new rxdn.of13.PacketIn();
 pi00.data = frame00;
-pi00.message.match.oxm_fields.push(new rxdn.Oxm({
+pi00.message.match.oxm_fields.push(new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "5",
 }));
@@ -49,7 +49,7 @@ test("Passes on messages that are not PacketIn", t => {
   let ereq: rxdn.OFEvent = {
     event: rxdn.OFEventType.Message,
     id: "1.1.1.1:1234",
-    message: new rxdn.EchoRequest(),
+    message: new rxdn.of13.EchoRequest(),
   };
   return <Observable<any>> rxdn.Acl({
     openflowDriver: Observable.of(ereq),

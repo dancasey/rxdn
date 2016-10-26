@@ -1,5 +1,5 @@
 import {OFComponent, OFEventType, OFEvent} from "../../drivers/openflow";
-import * as OF from "@dancasey/node-openflow";
+import {of10, of13} from "@dancasey/node-openflow";
 
 /**
  * Sends FeaturesRequest and handles FeaturesReply messages
@@ -23,8 +23,13 @@ export const Features: OFComponent = sources => {
 
   const featuresRequest = sources.openflowDriver
     .filter(m => m.event === OFEventType.Message && m.message.name === "ofp_hello")
-    .map((m: {id: string, event: OFEventType.Message, message: OF.Hello}) => {
-      const request = new OF.FeaturesRequest();
+    .map((m: {id: string, event: OFEventType.Message, message: of10.Hello | of13.Hello}) => {
+      let request: of10.FeaturesRequest | of13.FeaturesRequest;
+      if (m.message.message.header.version === of13.OFP_VERSION) {
+        request = new of13.FeaturesRequest();
+      } else {
+        request = new of10.FeaturesRequest();
+      }
       request.message.header.xid = m.message.message.header.xid + 1;
       return <OFEvent> {
         event: OFEventType.Message,

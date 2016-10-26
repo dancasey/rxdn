@@ -18,12 +18,12 @@ c4710800139a2a34000057e4247f0007\
 262728292a2b2c2d2e2f303132333435\
 3637";
 
-let packetInNoId = new rxdn.PacketIn();
-packetInNoId.message.match.oxm_fields.push(new rxdn.Oxm({
+let packetInNoId = new rxdn.of13.PacketIn();
+packetInNoId.message.match.oxm_fields.push(new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "5",
 }));
-packetInNoId.message.buffer_id = rxdn.OFP_NO_BUFFER;
+packetInNoId.message.buffer_id = rxdn.of13.OFP_NO_BUFFER;
 packetInNoId.data = frame00;
 
 const packetInNoIdEvent = Observable.of(<rxdn.OFEvent> {
@@ -32,8 +32,8 @@ const packetInNoIdEvent = Observable.of(<rxdn.OFEvent> {
   message: packetInNoId,
 });
 
-let packetInId = new rxdn.PacketIn();
-packetInId.message.match.oxm_fields.push(new rxdn.Oxm({
+let packetInId = new rxdn.of13.PacketIn();
+packetInId.message.match.oxm_fields.push(new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "5",
 }));
@@ -63,12 +63,12 @@ const switchMemoryDst: Observable<SMEvent> = Observable.of({
 
 //
 
-let packetOutNoDstNoId = new rxdn.PacketOut();
-packetOutNoDstNoId.message.actions.push(new rxdn.Action({
-  type: rxdn.ofp_action_type[rxdn.OFPAT_OUTPUT],
-  port: rxdn.OFPP_ALL,
+let packetOutNoDstNoId = new rxdn.of13.PacketOut();
+packetOutNoDstNoId.message.actions.push(new rxdn.of13.Action({
+  type: rxdn.of13.ofp_action_type[rxdn.of13.OFPAT_OUTPUT],
+  port: rxdn.of13.OFPP_ALL,
 }));
-packetOutNoDstNoId.message.buffer_id = rxdn.OFP_NO_BUFFER;
+packetOutNoDstNoId.message.buffer_id = rxdn.of13.OFP_NO_BUFFER;
 packetOutNoDstNoId.message.data = frame00;
 
 const packetOutNoDstNoIdEvent: rxdn.OFEvent = {
@@ -79,10 +79,10 @@ const packetOutNoDstNoIdEvent: rxdn.OFEvent = {
 
 //
 
-let packetOutNoDstId = new rxdn.PacketOut();
-packetOutNoDstId.message.actions.push(new rxdn.Action({
-  type: rxdn.ofp_action_type[rxdn.OFPAT_OUTPUT],
-  port: rxdn.OFPP_ALL,
+let packetOutNoDstId = new rxdn.of13.PacketOut();
+packetOutNoDstId.message.actions.push(new rxdn.of13.Action({
+  type: rxdn.of13.ofp_action_type[rxdn.of13.OFPAT_OUTPUT],
+  port: rxdn.of13.OFPP_ALL,
 }));
 packetOutNoDstId.message.buffer_id = 128;
 
@@ -94,12 +94,12 @@ const packetOutNoDstIdEvent: rxdn.OFEvent = {
 
 //
 
-let packetOutDstNoId = new rxdn.PacketOut();
-packetOutDstNoId.message.actions.push(new rxdn.Action({
-  type: rxdn.ofp_action_type[rxdn.OFPAT_OUTPUT],
+let packetOutDstNoId = new rxdn.of13.PacketOut();
+packetOutDstNoId.message.actions.push(new rxdn.of13.Action({
+  type: rxdn.of13.ofp_action_type[rxdn.of13.OFPAT_OUTPUT],
   port: 22,
 }));
-packetOutNoDstNoId.message.buffer_id = rxdn.OFP_NO_BUFFER;
+packetOutNoDstNoId.message.buffer_id = rxdn.of13.OFP_NO_BUFFER;
 packetOutDstNoId.message.data = frame00;
 
 const packetOutDstNoIdEvent: rxdn.OFEvent = {

@@ -9,6 +9,6 @@ test("Sends `Hello` on new connection", t => {
   } as rxdn.OFEvent);
   const result: Observable<any> = rxdn.Core({openflowDriver}).sinks.openflowDriver
     .map((m: {id: string, event: rxdn.OFEventType.Message, message: rxdn.OpenFlowMessage}) =>
-      t.deepEqual(m.message, new rxdn.Hello()));
+      t.deepEqual(m.message, new rxdn.of13.Hello()));
   return result;
 });

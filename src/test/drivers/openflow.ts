@@ -58,7 +58,7 @@ test.cb("exposes errors", t => {
 // set up a client to push data causing proper message decode
 function decodeClient() {
   let client = net.connect({port: DECODE_TEST_PORT}, () => {
-    client.write(new rxdn.Hello().encode());
+    client.write(new rxdn.of13.Hello().encode());
     client.end();
   });
 }
@@ -72,7 +72,7 @@ test.cb("decodes messages", t => {
     const msg = sources.openflowDriver
       .filter(e => e.event === rxdn.OFEventType.Message)
       .map((m: {id: string, event: rxdn.OFEventType.Message, message: rxdn.OpenFlowMessage}) => {
-        t.deepEqual(m.message, new rxdn.Hello());
+        t.deepEqual(m.message, new rxdn.of13.Hello());
         t.end();
       });
     const sinks = {
@@ -104,7 +104,7 @@ function encodeClient(t: ContextualCallbackTestContext) {
         t.fail(error);
         return;
       }
-      t.deepEqual(decoded, new rxdn.Hello());
+      t.deepEqual(decoded, new rxdn.of13.Hello());
       t.end();
     });
   });
@@ -119,7 +119,7 @@ test.cb("encodes messages", t => {
         .map(e => ({
           event: rxdn.OFEventType.Message,
           id: e.id,
-          message: new rxdn.Hello(),
+          message: new rxdn.of13.Hello(),
         })) as Observable<rxdn.OFEvent>,
     };
     return {sinks, sources};

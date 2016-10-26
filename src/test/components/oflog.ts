@@ -11,7 +11,7 @@ test("Does not output `sinks.openflowDriver`", t => {
   const openflowDriver = Observable.of({
     id: "1.2.3.4:1111",
     event: rxdn.OFEventType.Message,
-    message: new rxdn.Hello(),
+    message: new rxdn.of13.Hello(),
   } as rxdn.OFEvent);
   const result = rxdn.OFLog({openflowDriver});
   t.false(result.sinks.hasOwnProperty("openflowDriver"));
@@ -22,7 +22,7 @@ test("Logs Message events to sinks.consoleDriver", t => {
   const openflowDriver = Observable.of({
     id: "1.2.3.4:1111",
     event: rxdn.OFEventType.Message,
-    message: new rxdn.Hello(),
+    message: new rxdn.of13.Hello(),
   } as rxdn.OFEvent);
   const result = rxdn.OFLog({openflowDriver});
   return <Observable<any>> (<{consoleDriver: Observable<string>}> result.sinks).consoleDriver

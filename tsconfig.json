@@ -10,6 +10,7 @@
     "noImplicitReturns": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/rxdn.ts",
+    "src/test/**/*.ts"
   ]
 }

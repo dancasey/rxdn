@@ -1,7 +1,7 @@
 import {OFCollection, OFEvent, OFEventType} from "../../drivers/openflow";
 import {PIEvent, SMEvent, SMCollection} from "./memory";
 import {Observable} from "rxjs";
-import * as OF from "@dancasey/node-openflow";
+import {of13} from "@dancasey/node-openflow";
 
 /**
  * Configurable properties:
@@ -23,6 +23,12 @@ const defaultProps: Observable<FlowModProps> = Observable.of({
 
 export type FlowModSources = OFCollection & SMCollection & {props?: Observable<FlowModProps>};
 
+type FMCombined = {
+  pi: PIEvent,
+  p: FlowModProps,
+  sm: SMEvent
+}
+
 /** Sends FlowMod to source switch, referencing `buffer_id` of PacketIn */
 export const FlowMod = (sources: FlowModSources) => {
   let props: Observable<FlowModProps>;
@@ -35,35 +41,35 @@ export const FlowMod = (sources: FlowModSources) => {
     props = defaultProps;
   }
 
-  const flowmod: Observable<OFEvent> = Observable
-    .zip(sources.openflowDriver, sources.switchMemory)
-    .withLatestFrom(props, ([pi, sm], p) => [pi, sm, p])
-    .map(([pi, sm, p]: [PIEvent, SMEvent, FlowModProps]) => {
-      let fm = new OF.FlowMod();
+  const flowmod = sources.openflowDriver // Observable
+    // .zip(sources.openflowDriver, sources.switchMemory)
+    .withLatestFrom(props, sources.switchMemory, (pi, p, sm) => ({pi, p, sm}))
+    .map(({pi, p, sm}: FMCombined) => {
+      let fm = new of13.FlowMod();
       fm.message.header.xid = pi.message.message.header.xid;
       fm.message.buffer_id = pi.message.message.buffer_id;
-      fm.commandVal = OF.OFPFC_ADD;
-      fm.flagsVal = OF.OFPFF_SEND_FLOW_REM;
+      fm.commandVal = of13.OFPFC_ADD;
+      fm.flagsVal = of13.OFPFF_SEND_FLOW_REM;
       fm.message.hard_timeout = p.hardTimeout;
       fm.message.idle_timeout = p.idleTimeout;
       fm.message.priority = p.priority;
 
-      let ma = new OF.Match();
-      ma.oxm_fields.push(new OF.Oxm({
+      let ma = new of13.Match();
+      ma.oxm_fields.push(new of13.Oxm({
         oxm_field: "OFPXMT_OFB_ETH_DST",
         oxm_value: sm.dstmac,
       }));
       fm.message.match = ma;
 
-      let ins = new OF.Instruction();
-      ins.typeVal = OF.OFPIT_APPLY_ACTIONS;
-      let act = new OF.Action();
-      act.typeVal = OF.OFPAT_OUTPUT;
+      let ins = new of13.Instruction();
+      ins.typeVal = of13.OFPIT_APPLY_ACTIONS;
+      let act = new of13.Action();
+      act.typeVal = of13.OFPAT_OUTPUT;
       act.port = sm.dstport;
       // Set max_len: OFPCML_NO_BUFFER to work around OVS bug, as reported in Ryu:
       // github.com/osrg/ryu/blob/master/ryu/app/simple_switch_13.py#L41-L45
       // But, should not matter, as port is not set to controller.
-      act.max_len = OF.OFPCML_NO_BUFFER;
+      act.max_len = of13.OFPCML_NO_BUFFER;
       ins.actions.push(act);
       fm.message.instructions.push(ins);
 

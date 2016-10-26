@@ -1,7 +1,7 @@
 import {OFCollection, OFEvent, OFEventType} from "../../drivers/openflow";
 import {PIEvent, SMEvent, SMCollection, SMComponent} from "./memory";
 import {Observable} from "rxjs";
-import * as OF from "@dancasey/node-openflow";
+import {of13} from "@dancasey/node-openflow";
 
 /**
  * PacketOut
@@ -26,16 +26,16 @@ export const PacketOut: SMComponent = (sources: OFCollection & SMCollection) => 
   // Create flood packetOut events for packetIn events of unknown destinations
   const packetOutFlood = unknownDest
     .map(([pi]: [PIEvent, SMEvent]) => {
-      let po = new OF.PacketOut();
+      let po = new of13.PacketOut();
       po.message.header.xid = pi.message.message.header.xid;
       po.message.buffer_id = pi.message.message.buffer_id;
-      po.message.in_port = OF.OFPP_CONTROLLER;
-      let ac = new OF.Action({
-        type: OF.ofp_action_type[OF.OFPAT_OUTPUT],
-        port: OF.OFPP_ALL,
+      po.message.in_port = of13.OFPP_CONTROLLER;
+      let ac = new of13.Action({
+        type: of13.ofp_action_type[of13.OFPAT_OUTPUT],
+        port: of13.OFPP_ALL,
       });
       po.message.actions.push(ac);
-      if (po.message.buffer_id === OF.OFP_NO_BUFFER) {
+      if (po.message.buffer_id === of13.OFP_NO_BUFFER) {
         po.message.data = pi.message.message.data;
       }
       return <OFEvent> {
@@ -49,14 +49,14 @@ export const PacketOut: SMComponent = (sources: OFCollection & SMCollection) => 
   // unless there is a `buffer_id !== OFP_NO_BUFFER`; in that case, FlowMod suffices
   const packetOutDirect = knownDest
     .filter(([pi]: [PIEvent, SMEvent]) =>
-      pi.message.message.buffer_id === OF.OFP_NO_BUFFER)
+      pi.message.message.buffer_id === of13.OFP_NO_BUFFER)
     .map(([pi, sm]: [PIEvent, SMEvent]) => {
-      let po = new OF.PacketOut();
+      let po = new of13.PacketOut();
       po.message.header.xid = pi.message.message.header.xid;
-      po.message.buffer_id = OF.OFP_NO_BUFFER;
-      po.message.in_port = OF.OFPP_CONTROLLER;
-      let ac = new OF.Action({
-        type: OF.ofp_action_type[OF.OFPAT_OUTPUT],
+      po.message.buffer_id = of13.OFP_NO_BUFFER;
+      po.message.in_port = of13.OFPP_CONTROLLER;
+      let ac = new of13.Action({
+        type: of13.ofp_action_type[of13.OFPAT_OUTPUT],
         port: sm.dstport,
       });
       po.message.actions.push(ac);

@@ -1,5 +1,5 @@
 import {OFComponent, OFEventType, OFEvent} from "../../drivers/openflow";
-import * as OF from "@dancasey/node-openflow";
+import {of10, of13} from "@dancasey/node-openflow";
 
 /** Replies to EchoRequest messages and removes them from outgoing sources */
 export const Echo: OFComponent = sources => {
@@ -12,8 +12,13 @@ export const Echo: OFComponent = sources => {
   });
 
   const echoReply = echoRequests
-    .map((m: {id: string, event: OFEventType.Message, message: OF.EchoRequest}) => {
-      const reply = new OF.EchoReply();
+    .map((m: {id: string, event: OFEventType.Message, message: of10.EchoRequest | of13.EchoRequest}) => {
+      let reply: of10.EchoReply | of13.EchoReply;
+      if (m.message.message.header.version === of13.OFP_VERSION) {
+        reply = new of13.EchoReply();
+      } else {
+        reply = new of10.EchoReply();
+      }
       if (m.message.data.length > 0) {
         reply.data = m.message.data;
       }
