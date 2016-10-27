@@ -5,7 +5,7 @@ export * from "./components/core";
 export * from "./components/hub";
 export * from "./components/oflog";
 export * from "./components/push";
-export * from "./components/switch";
+export * from "./components/switch13";
 export * from "./drivers/console";
 export * from "./drivers/openflow";
 export * from "./drivers/state";

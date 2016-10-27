@@ -3,8 +3,8 @@ import * as R from "ramda";
 import * as rxdn from "../../../rxdn";
 import {Observable} from "rxjs";
 // Separately import FlowMod as it is not exported directly
-import {FlowMod} from "../../../components/switch/flowmod";
-import {SMEvent} from "../../../components/switch/memory";
+import {FlowMod} from "../../../components/switch13/flowmod";
+import {SMEvent} from "../../../components/switch13/memory";
 
 
 /* fixtures */

@@ -2,8 +2,8 @@ import test from "ava";
 import * as rxdn from "../../../rxdn";
 import {Observable} from "rxjs";
 // Separately import PacketOut as it is not exported directly
-import {PacketOut} from "../../../components/switch/packetout";
-import {SMEvent} from "../../../components/switch/memory";
+import {PacketOut} from "../../../components/switch13/packetout";
+import {SMEvent} from "../../../components/switch13/memory";
 
 
 /* fixtures */

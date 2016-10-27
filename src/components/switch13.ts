@@ -1,8 +1,8 @@
 import {OFComponent, OFCollection, OFEventType} from "../drivers/openflow";
 import {Compose} from "./compose";
-import {SwitchMemory, SwitchMemoryProps} from "./switch/memory";
-import {PacketOut} from "./switch/packetout";
-import {FlowMod, FlowModProps} from "./switch/flowmod";
+import {SwitchMemory, SwitchMemoryProps} from "./switch13/memory";
+import {PacketOut} from "./switch13/packetout";
+import {FlowMod, FlowModProps} from "./switch13/flowmod";
 import {Observable} from "rxjs";
 import {of13} from "@dancasey/node-openflow";
 
@@ -20,7 +20,7 @@ type SwitchSources = OFCollection & {props?: Observable<SwitchProps>};
  * 4. If not flood, installs a temporary FlowMod in source switch
  *
  */
-export const Switch: OFComponent = (sources: SwitchSources) => {
+export const Switch13: OFComponent = (sources: SwitchSources) => {
   // PacketIn messages
   const packetIn = sources.openflowDriver
     .filter(m =>

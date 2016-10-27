@@ -13,7 +13,7 @@ const main: rxdn.OFComponent = src => {
   return <{sources: rxdn.OFCollection, sinks: OFConsoleCollection}> rxdn.Compose([
     rxdn.Core,
     rxdn.Push,
-    rxdn.Switch,
+    rxdn.Switch13,
     rxdn.OFLog,
   ], src);
 };

@@ -2,7 +2,7 @@ import test from "ava";
 import * as rxdn from "../../../rxdn";
 import {Observable} from "rxjs";
 // Separately import SwitchMemory as it is not exported directly
-import {SwitchMemory, SMEvent} from "../../../components/switch/memory";
+import {SwitchMemory, SMEvent} from "../../../components/switch13/memory";
 
 
 /* fixtures */

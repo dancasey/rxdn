@@ -31,7 +31,7 @@ const packetIn00 = Observable.of(<rxdn.OFEvent> {
 
 test("Sends PacketOut", t => {
   t.plan(1);
-  return <Observable<any>> rxdn.Switch({
+  return <Observable<any>> rxdn.Switch13({
     openflowDriver: packetIn00,
   }).sinks.openflowDriver
     .first()
