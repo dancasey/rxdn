@@ -14,7 +14,8 @@ export const OFLog: Component = (sources: OFCollection) => {
       case OFEventType.Error:
         return `${show(OFEventType[m.event])} from ${show(m.id)}: ${show(m.error)}`;
       case OFEventType.Message:
-        return `${show(OFEventType[m.event])} from ${show(m.id)}: ${show(m.message)}`;
+        // return `${show(OFEventType[m.event])} from ${show(m.id)}: ${show(m.message)}`;
+        return `${show(OFEventType[m.event])} from ${show(m.id)}: ${show(m.message.name)}`;
       default:
         return `Unknown Event ${show(m)}`;
     }

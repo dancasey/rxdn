@@ -29,13 +29,14 @@ export const PacketOut: SMComponent = (sources: OFCollection & SMCollection) => 
       let po = new of10.PacketOut();
       po.message.header.xid = pi.message.message.header.xid;
       po.message.buffer_id = pi.message.message.buffer_id;
-      po.message.in_port = of10.OFPP_CONTROLLER;
+      po.message.in_port = pi.message.message.in_port;
       let ac = new of10.Action({
         type: of10.ofp_action_type[of10.OFPAT_OUTPUT],
-        port: of10.OFPP_ALL,
+        port: of10.OFPP_FLOOD,
+        max_len: 0xffe5,
       });
       po.message.actions.push(ac);
-      if (po.message.buffer_id === -1) {
+      if (po.message.buffer_id === of10.OFP_NO_BUFFER) {
         po.message.data = pi.message.message.data;
       }
       return <OFEvent> {
@@ -49,12 +50,12 @@ export const PacketOut: SMComponent = (sources: OFCollection & SMCollection) => 
   // unless there is a `buffer_id !== OFP_NO_BUFFER`; in that case, FlowMod suffices
   const packetOutDirect = knownDest
     .filter(([pi]: [PIEvent, SMEvent]) =>
-      pi.message.message.buffer_id === -1)
+      pi.message.message.buffer_id === of10.OFP_NO_BUFFER)
     .map(([pi, sm]: [PIEvent, SMEvent]) => {
       let po = new of10.PacketOut();
       po.message.header.xid = pi.message.message.header.xid;
-      po.message.buffer_id = -1;
-      po.message.in_port = of10.OFPP_CONTROLLER;
+      po.message.buffer_id = of10.OFP_NO_BUFFER;
+      po.message.in_port = pi.message.message.in_port;
       let ac = new of10.Action({
         type: of10.ofp_action_type[of10.OFPAT_OUTPUT],
         port: sm.dstport,

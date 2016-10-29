@@ -16,7 +16,7 @@ c4710800139a2a34000057e4247f0007\
 
 let pi00 = new rxdn.of10.PacketIn();
 pi00.data = frame00;
-pi00.message.buffer_id = -1;
+pi00.message.buffer_id = rxdn.of10.OFP_NO_BUFFER;
 pi00.message.in_port = 5;
 pi00.reasonVal = rxdn.of10.ofp_packet_in_reason.OFPR_NO_MATCH;
 pi00.message.total_len = 98;

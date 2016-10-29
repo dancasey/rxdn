@@ -6,21 +6,20 @@ interface OFConsoleCollection extends rxdn.OFCollection {
 }
 
 /**
- * Example L2 switch controller for OpenFlow 1.3.
- * Run with `node dist/examples/switch.js`.
+ * Example "hub" controller.
+ * Run with `node dist/examples/hub.js`.
  */
 const main: rxdn.OFComponent = src => {
   return <{sources: rxdn.OFCollection, sinks: OFConsoleCollection}> rxdn.Compose([
-    rxdn.Core13,
-    rxdn.Push,
-    rxdn.Switch13,
+    rxdn.Core10,
+    rxdn.Hub,
     rxdn.OFLog,
   ], src);
 };
 
 const drivers: rxdn.Drivers = {
   consoleDriver: rxdn.consoleDriver,
-  openflowDriver: rxdn.makeOpenFlowDriver({host: "0.0.0.0", port: 6653}),
+  openflowDriver: rxdn.makeOpenFlowDriver({host: "0.0.0.0", port: 6633}),
 };
 
 rxdn.run(main, drivers);

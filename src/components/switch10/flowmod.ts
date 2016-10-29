@@ -83,7 +83,7 @@ export const FlowMod = (sources: FlowModSources) => {
       // Set max_len: OFPCML_NO_BUFFER to work around OVS bug, as reported in Ryu:
       // github.com/osrg/ryu/blob/master/ryu/app/simple_switch_13.py#L41-L45
       // But, should not matter, as port is not set to controller.
-      act.max_len = 0;
+      act.max_len = 0xffff;
       fm.message.actions = [act];
 
       return <OFEvent> {

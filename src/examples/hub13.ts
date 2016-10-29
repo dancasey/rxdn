@@ -11,7 +11,7 @@ interface OFConsoleCollection extends rxdn.OFCollection {
  */
 const main: rxdn.OFComponent = src => {
   return <{sources: rxdn.OFCollection, sinks: OFConsoleCollection}> rxdn.Compose([
-    rxdn.Core,
+    rxdn.Core13,
     rxdn.Push,
     rxdn.Hub,
     rxdn.OFLog,

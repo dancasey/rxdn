@@ -3,6 +3,9 @@ import {Driver, Collection} from "../interfaces";
 import {createServer, Socket, ListenOptions} from "net";
 import {Observable, Observer} from "rxjs";
 
+// import {inspect} from "util";
+// const insp = (obj: any) => inspect(obj, {colors: true, depth: 4});
+
 export enum OFEventType {
   Connection,
   Disconnection,
@@ -93,10 +96,14 @@ export function makeOpenFlowDriver(options = defaultOptions) {
           // Try to encode the message
           try {
             buffer = outgoing.message.encode();
+            // console.error(`openFlowDriver: sending ${outgoing.message.name}: ${insp(buffer)}`);
             socket.write(buffer);
           } catch (error) {
-            console.error(`openFlowDriver: Could not encode: ${error}`);
+            console.error(`openFlowDriver: Could not encode ${outgoing.message.name}: ${error}`);
+            console.error(error.stack);
           }
+        } else {
+          console.error(`openFlowDriver: non-message ${outgoing.event}`);
         }
       },
       error: (err) => server.close(),

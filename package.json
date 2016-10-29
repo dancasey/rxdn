@@ -52,7 +52,7 @@
     "typescript": "^2.0.0"
   },
   "dependencies": {
-    "@dancasey/node-openflow": "^0.2.1",
+    "@dancasey/node-openflow": "^0.2.3",
     "ethernet": "^1.0.1",
     "ramda": "^0.22.1",
     "rxjs": "^5.0.0-rc.1"
