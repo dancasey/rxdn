@@ -1,11 +1,6 @@
 import {OFComponent, OFEventType, OFEvent} from "../drivers/openflow";
 import {of10, of13} from "@dancasey/node-openflow";
 
-import {inspect} from "util";
-const show = (item: any) =>
-  /* tslint:disable-next-line:no-console */
-  item instanceof Object ? console.log(inspect(item, {colors: true, depth: 4})) : console.log(item);
-
 /** Responds to PacketIn with PacketOut which floods */
 export const Hub: OFComponent = sources => {
   const packetout = sources.openflowDriver
@@ -56,10 +51,6 @@ export const Hub: OFComponent = sources => {
 
       // Keep same xid as PacketIn
       po.message.header.xid = m.message.message.header.xid;
-
-      show("---------------- outgoing packetout ----------------");
-      show(po);
-      show(po.encode());
 
       return <OFEvent> {
         event: OFEventType.Message,
