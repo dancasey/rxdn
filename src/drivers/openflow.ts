@@ -32,12 +32,6 @@ const defaultOptions: ListenOptions = {
   host: "localhost",
 };
 
-/** Generate an `id` string for a Socket */
-export const socketId = (socket: Socket): string => {
-  const address = socket.address();
-  return `${address.address}:${address.port}`;
-};
-
 /**
  * OpenFlow driver
  * @param {ListenOptions} [options=defaultOptions] Server options for net.Server
@@ -50,8 +44,9 @@ export function makeOpenFlowDriver(options = defaultOptions) {
     server.listen(options);
     server.on("connection", (socket: Socket) => {
       // Add socket to map
-      let id = socketId(socket);
+      const id = `${socket.remoteAddress}:${socket.remotePort}`;
       sockets.set(id, socket);
+
       // Tell the observer about the new connection
       observer.next({event: OFEventType.Connection, id});
 
