@@ -67,9 +67,15 @@ export function makeOpenFlowDriver(options = defaultOptions) {
       socket.on("error", (error: Error) => observer.next({event: OFEventType.Error, id, error}));
       socket.on("data", (buffer: Buffer) => {
         // Try to decode the buffer into an OpenFlowMessage
+        let bytesRead = 0;
+        let message: OF.OpenFlowMessage;
         try {
-          let message = OF.decode(buffer);
-          observer.next({event: OFEventType.Message, id, message});
+          // Loop until we get all the messages out of the buffer
+          while (bytesRead < buffer.length) {
+            message = OF.decode(buffer.slice(bytesRead));
+            observer.next({event: OFEventType.Message, id, message});
+            bytesRead += message.message.header.length;
+          }
         } catch (error) {
           observer.next({event: OFEventType.Error, id, error});
         }

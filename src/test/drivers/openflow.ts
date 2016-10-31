@@ -12,7 +12,8 @@ const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;
 const CLIENT_DELAY = 0; // setTimeout delay for clients
 const ERROR_TEST_PORT = 1234;
 const DECODE_TEST_PORT = ERROR_TEST_PORT + 1;
-const ENCODE_TEST_PORT = DECODE_TEST_PORT + 1;
+const MDECODE_TEST_PORT = DECODE_TEST_PORT + 1;
+const ENCODE_TEST_PORT = MDECODE_TEST_PORT + 1;
 
 /**
  * Error test
@@ -87,6 +88,50 @@ test.cb("decodes messages", t => {
   };
   rxdn.run(main, drivers);
   setTimeout(decodeClient, CLIENT_DELAY);
+});
+
+/**
+ * Decode test
+ */
+
+// set up a client to push data causing proper message decode
+function multiDecodeClient() {
+  let client = net.connect({port: MDECODE_TEST_PORT}, () => {
+    const h = new rxdn.of10.Hello();
+    const e = new rxdn.of10.EchoRequest();
+    const buffer = Buffer.concat([h.encode(), e.encode()]);
+    client.write(buffer);
+    client.end();
+  });
+}
+test.cb("decodes multiple messages from single buffer", t => {
+  t.plan(2);
+  const main: rxdn.OFComponent = sources => {
+    const err = sources.openflowDriver
+      .filter(e => e.event === rxdn.OFEventType.Error)
+      .map(e => t.fail());
+    const msg = sources.openflowDriver
+      .filter(e => e.event === rxdn.OFEventType.Message)
+      .map((m: {id: string, event: rxdn.OFEventType.Message, message: rxdn.OpenFlowMessage}) => {
+        if (m.message instanceof rxdn.of10.Hello) {
+          t.deepEqual(m.message, new rxdn.of10.Hello());
+        } else if (m.message instanceof rxdn.of10.EchoRequest) {
+          t.deepEqual(m.message, new rxdn.of10.EchoRequest());
+          t.end();
+        }
+      });
+    const sinks = {
+      openflowDriver: sources.openflowDriver.filter(() => false),
+      subscribeDriver: err.merge(msg),
+    };
+    return {sinks, sources};
+  };
+  const drivers: rxdn.Drivers = {
+    openflowDriver: rxdn.makeOpenFlowDriver({port: MDECODE_TEST_PORT}),
+    subscribeDriver: identityDriver,
+  };
+  rxdn.run(main, drivers);
+  setTimeout(multiDecodeClient, CLIENT_DELAY);
 });
 
 /**
