@@ -66,7 +66,7 @@ export function makeOpenFlowDriver(options = defaultOptions) {
         let message: OF.OpenFlowMessage;
         try {
           // Loop until we get all the messages out of the buffer
-          while (bytesRead < buffer.length) {
+          while (buffer.length > bytesRead && buffer.length >= 8) {
             message = OF.decode(buffer.slice(bytesRead));
             observer.next({event: OFEventType.Message, id, message});
             bytesRead += message.message.header.length;
