@@ -6,6 +6,11 @@ import test, {ContextualCallbackTestContext} from "ava";
 import * as net from "net";
 import * as rxdn from "../../rxdn";
 import {Observable} from "rxjs";
+import {readFileSync} from "fs";
+import {join} from "path";
+
+// import {inspect} from "util";
+// const insp = (obj: any) => inspect(obj, {colors: true, depth: 4});
 
 const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;
 
@@ -14,6 +19,7 @@ const ERROR_TEST_PORT = 1234;
 const DECODE_TEST_PORT = ERROR_TEST_PORT + 1;
 const MDECODE_TEST_PORT = DECODE_TEST_PORT + 1;
 const ENCODE_TEST_PORT = MDECODE_TEST_PORT + 1;
+const PI_TEST_PORT = ENCODE_TEST_PORT + 1;
 
 /**
  * Error test
@@ -174,4 +180,54 @@ test.cb("encodes messages", t => {
   };
   rxdn.run(main, drivers);
   setTimeout(encodeClient, CLIENT_DELAY, t);
+});
+
+/**
+ * Lots of PacketIn Messages (71)
+ *
+ * Taken from capture of cbench running in throughput mode (-t).
+ * xid 234 (0X0ea) is the first message,
+ * xid 304 (0x130) is the last message.
+ */
+const piPath = join(__dirname, "../../../test_assets/packetsIn.txt");
+const packetsIn = Buffer.from(readFileSync(piPath, "ascii"), "hex");
+
+// set up a client
+function piClient() {
+  let client = net.connect({port: PI_TEST_PORT}, () => {
+    client.write(packetsIn);
+    client.end();
+  });
+}
+
+test.cb("decodes many concatenated PacketIn messages", t => {
+  t.plan(71);
+  const main: rxdn.OFComponent = sources => {
+    const err = sources.openflowDriver
+      .filter(e => e.event === rxdn.OFEventType.Error)
+      .map(e => t.fail());
+    const msg = sources.openflowDriver
+      .filter(e => e.event === rxdn.OFEventType.Message)
+      .map((m: {id: string, event: rxdn.OFEventType.Message, message: rxdn.OpenFlowMessage}) => {
+        // console.log(`pi xid ${m.message.message.header.xid}`);
+        t.true(m.message.name === "ofp_packet_in");
+        // if (m.message.message.header.xid % 10 === 0) {
+        //   console.log(insp(m));
+        // }
+        if (m.message.message.header.xid === 0x130) {
+          t.end();
+        }
+      });
+    const sinks = {
+      openflowDriver: sources.openflowDriver.filter(() => false),
+      subscribeDriver: err.merge(msg),
+    };
+    return {sinks, sources};
+  };
+  const drivers: rxdn.Drivers = {
+    openflowDriver: rxdn.makeOpenFlowDriver({port: PI_TEST_PORT}),
+    subscribeDriver: identityDriver,
+  };
+  rxdn.run(main, drivers);
+  setTimeout(piClient, CLIENT_DELAY);
 });
