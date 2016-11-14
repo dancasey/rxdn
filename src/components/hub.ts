@@ -42,7 +42,7 @@ export const Hub: OFComponent = sources => {
 
         // If the switch did not buffer, then copy the data; otherwise reference by id
         if (m.message.message.buffer_id === of10.OFP_NO_BUFFER) {
-          po.message.data = m.message.data.toString();
+          po.message.data = m.message.data;
           po.message.buffer_id = of10.OFP_NO_BUFFER;
         } else {
           po.message.buffer_id = m.message.message.buffer_id;

@@ -75,6 +75,7 @@ export const SwitchMemory: SMComponent = (sources: OFCollection & {props?: Obser
   type State = Map<string, Location>;
   const remember = source
     .map(({id, srcport, srcmac}) => (state: State) => state.set(srcmac, {id, srcport}));
+  // The `delay` operator uses Scheduler.async by default
   const forget = source
     .withLatestFrom(props)
     .switchMap(([s, p]) => Observable.of(s).delay(p.timeout))

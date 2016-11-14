@@ -97,7 +97,8 @@ export function makeOpenFlowDriver(options = defaultOptions) {
           // Try to encode the message
           try {
             buffer = outgoing.message.encode();
-            // console.error(`openFlowDriver: sending ${outgoing.message.name}: ${insp(buffer)}`);
+            // console.log(`openFlowDriver: sending ${outgoing.message.name}: ${insp(buffer)}`);
+            // console.log(`openFlowDriver: sending ${outgoing.message.name} to ${outgoing.id}`);
             socket.write(buffer);
           } catch (error) {
             console.error(`openFlowDriver: Could not encode ${outgoing.message.name}: ${error}`);
