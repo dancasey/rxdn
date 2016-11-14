@@ -2,8 +2,8 @@ import test from "ava";
 import * as rxdn from "../../../rxdn";
 import {Observable} from "rxjs";
 // Separately import PacketOut as it is not exported directly
-import {PacketOut} from "../../../components/switch13/packetout";
-import {SMEvent} from "../../../components/switch13/memory";
+import {PacketOut} from "../../../components/switch10/packetout";
+import {SMEvent} from "../../../components/switch10/memory";
 
 
 /* fixtures */
@@ -18,12 +18,9 @@ c4710800139a2a34000057e4247f0007\
 262728292a2b2c2d2e2f303132333435\
 3637";
 
-let packetInNoId = new rxdn.of13.PacketIn();
-packetInNoId.message.match.oxm_fields.push(new rxdn.of13.Oxm({
-  oxm_field: "OFPXMT_OFB_IN_PORT",
-  oxm_value: "5",
-}));
-packetInNoId.message.buffer_id = rxdn.of13.OFP_NO_BUFFER;
+let packetInNoId = new rxdn.of10.PacketIn();
+packetInNoId.message.in_port = 5;
+packetInNoId.message.buffer_id = rxdn.of10.OFP_NO_BUFFER;
 packetInNoId.data = frame00;
 
 const packetInNoIdEvent = Observable.of(<rxdn.OFEvent> {
@@ -32,11 +29,8 @@ const packetInNoIdEvent = Observable.of(<rxdn.OFEvent> {
   message: packetInNoId,
 });
 
-let packetInId = new rxdn.of13.PacketIn();
-packetInId.message.match.oxm_fields.push(new rxdn.of13.Oxm({
-  oxm_field: "OFPXMT_OFB_IN_PORT",
-  oxm_value: "5",
-}));
+let packetInId = new rxdn.of10.PacketIn();
+packetInId.message.in_port = 5;
 packetInId.message.buffer_id = 128;
 
 const packetInIdEvent = Observable.of(<rxdn.OFEvent> {
@@ -63,12 +57,14 @@ const switchMemoryDst: Observable<SMEvent> = Observable.of({
 
 //
 
-let packetOutNoDstNoId = new rxdn.of13.PacketOut();
-packetOutNoDstNoId.message.actions.push(new rxdn.of13.Action({
-  type: rxdn.of13.ofp_action_type[rxdn.of13.OFPAT_OUTPUT],
-  port: rxdn.of13.OFPP_ALL,
-}));
-packetOutNoDstNoId.message.buffer_id = rxdn.of13.OFP_NO_BUFFER;
+let packetOutNoDstNoId = new rxdn.of10.PacketOut();
+packetOutNoDstNoId.message.actions = [new rxdn.of10.Action({
+  type: rxdn.of10.ofp_action_type[rxdn.of10.OFPAT_OUTPUT],
+  port: rxdn.of10.OFPP_FLOOD,
+  max_len: 0xFFE5,
+})];
+packetOutNoDstNoId.message.in_port = 5;
+packetOutNoDstNoId.message.buffer_id = rxdn.of10.OFP_NO_BUFFER;
 packetOutNoDstNoId.message.data = frame00;
 
 const packetOutNoDstNoIdEvent: rxdn.OFEvent = {
@@ -79,11 +75,13 @@ const packetOutNoDstNoIdEvent: rxdn.OFEvent = {
 
 //
 
-let packetOutNoDstId = new rxdn.of13.PacketOut();
-packetOutNoDstId.message.actions.push(new rxdn.of13.Action({
-  type: rxdn.of13.ofp_action_type[rxdn.of13.OFPAT_OUTPUT],
-  port: rxdn.of13.OFPP_ALL,
-}));
+let packetOutNoDstId = new rxdn.of10.PacketOut();
+packetOutNoDstId.message.actions = [new rxdn.of10.Action({
+  type: rxdn.of10.ofp_action_type[rxdn.of10.OFPAT_OUTPUT],
+  port: rxdn.of10.OFPP_FLOOD,
+  max_len: 0xFFE5,
+})];
+packetOutNoDstId.message.in_port = 5;
 packetOutNoDstId.message.buffer_id = 128;
 
 const packetOutNoDstIdEvent: rxdn.OFEvent = {
@@ -94,12 +92,13 @@ const packetOutNoDstIdEvent: rxdn.OFEvent = {
 
 //
 
-let packetOutDstNoId = new rxdn.of13.PacketOut();
-packetOutDstNoId.message.actions.push(new rxdn.of13.Action({
-  type: rxdn.of13.ofp_action_type[rxdn.of13.OFPAT_OUTPUT],
+let packetOutDstNoId = new rxdn.of10.PacketOut();
+packetOutDstNoId.message.actions = [new rxdn.of10.Action({
+  type: rxdn.of10.ofp_action_type[rxdn.of10.OFPAT_OUTPUT],
   port: 22,
-}));
-packetOutNoDstNoId.message.buffer_id = rxdn.of13.OFP_NO_BUFFER;
+})];
+packetOutDstNoId.message.in_port = 5;
+packetOutDstNoId.message.buffer_id = rxdn.of10.OFP_NO_BUFFER;
 packetOutDstNoId.message.data = frame00;
 
 const packetOutDstNoIdEvent: rxdn.OFEvent = {
