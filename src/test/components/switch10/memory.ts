@@ -2,7 +2,7 @@ import test from "ava";
 import * as rxdn from "../../../rxdn";
 import {Observable} from "rxjs";
 // Separately import SwitchMemory as it is not exported directly
-import {SwitchMemory, SMEvent} from "../../../components/switch13/memory";
+import {SwitchMemory, SMEvent} from "../../../components/switch10/memory";
 
 
 /* fixtures */
@@ -37,26 +37,17 @@ c4710800139a2a34000057e4247f0007\
 262728292a2b2c2d2e2f303132333435\
 3637";
 
-let pi00 = new rxdn.of13.PacketIn();
+let pi00 = new rxdn.of10.PacketIn();
 pi00.data = frame00;
-pi00.message.match.oxm_fields.push(new rxdn.of13.Oxm({
-  oxm_field: "OFPXMT_OFB_IN_PORT",
-  oxm_value: "5",
-}));
+pi00.message.in_port = 5;
 
-let pi01 = new rxdn.of13.PacketIn();
+let pi01 = new rxdn.of10.PacketIn();
 pi01.data = frame01;
-pi01.message.match.oxm_fields.push(new rxdn.of13.Oxm({
-  oxm_field: "OFPXMT_OFB_IN_PORT",
-  oxm_value: "10",
-}));
+pi01.message.in_port = 10;
 
-let pi02 = new rxdn.of13.PacketIn();
+let pi02 = new rxdn.of10.PacketIn();
 pi02.data = frame02;
-pi02.message.match.oxm_fields.push(new rxdn.of13.Oxm({
-  oxm_field: "OFPXMT_OFB_IN_PORT",
-  oxm_value: "20",
-}));
+pi02.message.in_port = 20;
 
 const packetIn00 = Observable.of(<rxdn.OFEvent> {
   event: rxdn.OFEventType.Message,
