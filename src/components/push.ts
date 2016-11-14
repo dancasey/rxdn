@@ -39,7 +39,7 @@ export const Push: OFComponent = sources => {
       // Build the instruction to apply the Action
       let ins = new of13.Instruction();
       ins.typeVal = of13.OFPIT_APPLY_ACTIONS;
-      ins.actions.push(action);
+      ins.actions = [action];
 
       // Build the FlowMod message to add the Instruction
       let fm = new of13.FlowMod();
@@ -49,7 +49,7 @@ export const Push: OFComponent = sources => {
       fm.message.out_group = of13.OFPG_ANY;
       fm.message.flags = [];
       fm.message.priority = PRIORITY;
-      fm.message.instructions.push(ins);
+      fm.message.instructions = [ins];
 
       return <OFEvent> {
         event: OFEventType.Message,

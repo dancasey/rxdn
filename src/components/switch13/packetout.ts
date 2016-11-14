@@ -34,7 +34,7 @@ export const PacketOut: SMComponent = (sources: OFCollection & SMCollection) => 
         type: of13.ofp_action_type[of13.OFPAT_OUTPUT],
         port: of13.OFPP_ALL,
       });
-      po.message.actions.push(ac);
+      po.message.actions = [ac];
       if (po.message.buffer_id === of13.OFP_NO_BUFFER) {
         po.message.data = pi.message.message.data;
       }
@@ -59,7 +59,7 @@ export const PacketOut: SMComponent = (sources: OFCollection & SMCollection) => 
         type: of13.ofp_action_type[of13.OFPAT_OUTPUT],
         port: sm.dstport,
       });
-      po.message.actions.push(ac);
+      po.message.actions = [ac];
       po.message.data = pi.message.message.data;
       return <OFEvent> {
         id: pi.id,

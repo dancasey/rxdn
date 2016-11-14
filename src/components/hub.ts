@@ -18,7 +18,7 @@ export const Hub: OFComponent = sources => {
         // Build the PacketOut that applies the Action
         po = new of13.PacketOut();
         po.message.in_port = of13.OFPP_CONTROLLER;
-        po.message.actions.push(action);
+        po.message.actions = [action];
 
         // If the switch did not buffer, then copy the data; otherwise reference by id
         if (m.message.message.buffer_id === of13.OFP_NO_BUFFER) {
@@ -38,7 +38,7 @@ export const Hub: OFComponent = sources => {
         // Build the PacketOut that applies the Action
         po = new of10.PacketOut();
         po.message.in_port = m.message.message.in_port;
-        po.message.actions.push(action);
+        po.message.actions = [action];
 
         // If the switch did not buffer, then copy the data; otherwise reference by id
         if (m.message.message.buffer_id === of10.OFP_NO_BUFFER) {

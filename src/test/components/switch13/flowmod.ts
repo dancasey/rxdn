@@ -21,10 +21,10 @@ c4710800139a2a34000057e4247f0007\
 
 let pi00 = new rxdn.of13.PacketIn();
 pi00.data = frame00;
-pi00.message.match.oxm_fields.push(new rxdn.of13.Oxm({
+pi00.message.match.oxm_fields = [new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "5",
-}));
+})];
 
 const packetIn00 = Observable.of(<rxdn.OFEvent> {
   event: rxdn.OFEventType.Message,
@@ -48,7 +48,7 @@ fm.message.buffer_id = 0;
 fm.flagsVal = rxdn.of13.OFPFF_SEND_FLOW_REM;
 
 let match = new rxdn.of13.Match();
-match.oxm_fields.push(new rxdn.of13.Oxm({oxm_field: "OFPXMT_OFB_ETH_DST", oxm_value: "665544332211"}));
+match.oxm_fields = [new rxdn.of13.Oxm({oxm_field: "OFPXMT_OFB_ETH_DST", oxm_value: "665544332211"})];
 fm.message.match = match;
 
 let ins = new rxdn.of13.Instruction();
@@ -57,8 +57,8 @@ let act = new rxdn.of13.Action();
 act.typeVal = rxdn.of13.OFPAT_OUTPUT;
 act.port = 55;
 act.max_len = rxdn.of13.OFPCML_NO_BUFFER;
-ins.actions.push(act);
-fm.message.instructions.push(ins);
+ins.actions = [act];
+fm.message.instructions = [ins];
 
 const props = {
   hardTimeout: 22,
@@ -69,7 +69,6 @@ let fmProps = R.clone(fm);
 fmProps.message.hard_timeout = props.hardTimeout;
 fmProps.message.idle_timeout = props.idleTimeout;
 fmProps.message.priority = props.priority;
-fmProps.message.header.length = 88;
 
 /* tests */
 
@@ -86,7 +85,7 @@ test("Creates the corresponding FlowMod", t => {
     .map(m => t.deepEqual(m, expecting));
 });
 
-test.only("Adjusts timeouts based on props", t => {
+test("Adjusts timeouts based on props", t => {
   t.plan(1);
 
   const expecting: rxdn.OFEvent = {

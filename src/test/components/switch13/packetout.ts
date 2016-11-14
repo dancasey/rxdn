@@ -19,10 +19,10 @@ c4710800139a2a34000057e4247f0007\
 3637";
 
 let packetInNoId = new rxdn.of13.PacketIn();
-packetInNoId.message.match.oxm_fields.push(new rxdn.of13.Oxm({
+packetInNoId.message.match.oxm_fields = [new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "5",
-}));
+})];
 packetInNoId.message.buffer_id = rxdn.of13.OFP_NO_BUFFER;
 packetInNoId.data = frame00;
 
@@ -33,10 +33,10 @@ const packetInNoIdEvent = Observable.of(<rxdn.OFEvent> {
 });
 
 let packetInId = new rxdn.of13.PacketIn();
-packetInId.message.match.oxm_fields.push(new rxdn.of13.Oxm({
+packetInId.message.match.oxm_fields = [new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "5",
-}));
+})];
 packetInId.message.buffer_id = 128;
 
 const packetInIdEvent = Observable.of(<rxdn.OFEvent> {
@@ -64,10 +64,10 @@ const switchMemoryDst: Observable<SMEvent> = Observable.of({
 //
 
 let packetOutNoDstNoId = new rxdn.of13.PacketOut();
-packetOutNoDstNoId.message.actions.push(new rxdn.of13.Action({
+packetOutNoDstNoId.message.actions = [new rxdn.of13.Action({
   type: rxdn.of13.ofp_action_type[rxdn.of13.OFPAT_OUTPUT],
   port: rxdn.of13.OFPP_ALL,
-}));
+})];
 packetOutNoDstNoId.message.buffer_id = rxdn.of13.OFP_NO_BUFFER;
 packetOutNoDstNoId.message.data = frame00;
 
@@ -80,10 +80,10 @@ const packetOutNoDstNoIdEvent: rxdn.OFEvent = {
 //
 
 let packetOutNoDstId = new rxdn.of13.PacketOut();
-packetOutNoDstId.message.actions.push(new rxdn.of13.Action({
+packetOutNoDstId.message.actions = [new rxdn.of13.Action({
   type: rxdn.of13.ofp_action_type[rxdn.of13.OFPAT_OUTPUT],
   port: rxdn.of13.OFPP_ALL,
-}));
+})];
 packetOutNoDstId.message.buffer_id = 128;
 
 const packetOutNoDstIdEvent: rxdn.OFEvent = {
@@ -95,10 +95,10 @@ const packetOutNoDstIdEvent: rxdn.OFEvent = {
 //
 
 let packetOutDstNoId = new rxdn.of13.PacketOut();
-packetOutDstNoId.message.actions.push(new rxdn.of13.Action({
+packetOutDstNoId.message.actions = [new rxdn.of13.Action({
   type: rxdn.of13.ofp_action_type[rxdn.of13.OFPAT_OUTPUT],
   port: 22,
-}));
+})];
 packetOutNoDstNoId.message.buffer_id = rxdn.of13.OFP_NO_BUFFER;
 packetOutDstNoId.message.data = frame00;
 

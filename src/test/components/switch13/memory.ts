@@ -39,24 +39,24 @@ c4710800139a2a34000057e4247f0007\
 
 let pi00 = new rxdn.of13.PacketIn();
 pi00.data = frame00;
-pi00.message.match.oxm_fields.push(new rxdn.of13.Oxm({
+pi00.message.match.oxm_fields = [new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "5",
-}));
+})];
 
 let pi01 = new rxdn.of13.PacketIn();
 pi01.data = frame01;
-pi01.message.match.oxm_fields.push(new rxdn.of13.Oxm({
+pi01.message.match.oxm_fields = [new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "10",
-}));
+})];
 
 let pi02 = new rxdn.of13.PacketIn();
 pi02.data = frame02;
-pi02.message.match.oxm_fields.push(new rxdn.of13.Oxm({
+pi02.message.match.oxm_fields = [new rxdn.of13.Oxm({
   oxm_field: "OFPXMT_OFB_IN_PORT",
   oxm_value: "20",
-}));
+})];
 
 const packetIn00 = Observable.of(<rxdn.OFEvent> {
   event: rxdn.OFEventType.Message,
