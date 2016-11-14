@@ -20,11 +20,11 @@ test("Sends 1.0 `EchoReply` with matching xid and data", t => {
 
   let request = new rxdn.of10.EchoRequest();
   request.message.header.xid = xid;
-  request.data = data;
+  request.data = data.toString("hex");
 
   let reply = new rxdn.of10.EchoReply();
   reply.message.header.xid = xid;
-  reply.data = data;
+  reply.data = data.toString("hex");
 
   const openflowDriver = Observable.of({
     event: rxdn.OFEventType.Message,
@@ -68,11 +68,11 @@ test("Sends 1.3 `EchoReply` with matching xid and data", t => {
 
   let request = new rxdn.of13.EchoRequest();
   request.message.header.xid = xid;
-  request.data = data;
+  request.data = data.toString("hex");
 
   let reply = new rxdn.of13.EchoReply();
   reply.message.header.xid = xid;
-  reply.data = data;
+  reply.data = data.toString("hex");
 
   const openflowDriver = Observable.of({
     event: rxdn.OFEventType.Message,
