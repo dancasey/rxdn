@@ -55,10 +55,10 @@ export const FlowMod = (sources: FlowModSources) => {
       fm.message.priority = p.priority;
 
       let ma = new of13.Match();
-      ma.oxm_fields.push(new of13.Oxm({
+      ma.oxm_fields = [new of13.Oxm({
         oxm_field: "OFPXMT_OFB_ETH_DST",
         oxm_value: sm.dstmac,
-      }));
+      })];
       fm.message.match = ma;
 
       let ins = new of13.Instruction();
@@ -70,8 +70,8 @@ export const FlowMod = (sources: FlowModSources) => {
       // github.com/osrg/ryu/blob/master/ryu/app/simple_switch_13.py#L41-L45
       // But, should not matter, as port is not set to controller.
       act.max_len = of13.OFPCML_NO_BUFFER;
-      ins.actions.push(act);
-      fm.message.instructions.push(ins);
+      ins.actions = [act];
+      fm.message.instructions = [ins];
 
       return <OFEvent> {
         id: pi.id,

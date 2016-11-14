@@ -3,8 +3,8 @@ import * as R from "ramda";
 import * as rxdn from "../../../rxdn";
 import {Observable} from "rxjs";
 // Separately import FlowMod as it is not exported directly
-import {FlowMod} from "../../../components/switch13/flowmod";
-import {SMEvent} from "../../../components/switch13/memory";
+import {FlowMod} from "../../../components/switch10/flowmod";
+import {SMEvent} from "../../../components/switch10/memory";
 
 
 /* fixtures */
@@ -19,12 +19,9 @@ c4710800139a2a34000057e4247f0007\
 262728292a2b2c2d2e2f303132333435\
 3637";
 
-let pi00 = new rxdn.of13.PacketIn();
+let pi00 = new rxdn.of10.PacketIn();
 pi00.data = frame00;
-pi00.message.match.oxm_fields.push(new rxdn.of13.Oxm({
-  oxm_field: "OFPXMT_OFB_IN_PORT",
-  oxm_value: "5",
-}));
+pi00.message.in_port = 5;
 
 const packetIn00 = Observable.of(<rxdn.OFEvent> {
   event: rxdn.OFEventType.Message,
@@ -40,31 +37,43 @@ const sm00: Observable<SMEvent> = Observable.of({
   dstmac: "665544332211",
 });
 
-let fm = new rxdn.of13.FlowMod();
+let fm = new rxdn.of10.FlowMod();
 fm.message.idle_timeout = 5;
 fm.message.hard_timeout = 10;
 fm.message.priority = 10;
 fm.message.buffer_id = 0;
-fm.flagsVal = rxdn.of13.OFPFF_SEND_FLOW_REM;
-
-let match = new rxdn.of13.Match();
-match.oxm_fields.push(new rxdn.of13.Oxm({oxm_field: "OFPXMT_OFB_ETH_DST", oxm_value: "665544332211"}));
-fm.message.match = match;
-
-let ins = new rxdn.of13.Instruction();
-ins.typeVal = rxdn.of13.OFPIT_APPLY_ACTIONS;
-let act = new rxdn.of13.Action();
-act.typeVal = rxdn.of13.OFPAT_OUTPUT;
+fm.flagsVal = rxdn.of10.OFPFF_SEND_FLOW_REM;
+let act = new rxdn.of10.Action();
+act.typeVal = rxdn.of10.OFPAT_OUTPUT;
 act.port = 55;
-act.max_len = rxdn.of13.OFPCML_NO_BUFFER;
-ins.actions.push(act);
-fm.message.instructions.push(ins);
-
+act.max_len = 0xffff;
+fm.message.actions = [act];
 const props = {
   hardTimeout: 22,
   idleTimeout: 23,
   priority: 24,
 };
+fm.message.match.wildcards = [
+  "OFPFW_IN_PORT",
+  "OFPFW_DL_VLAN",
+  "OFPFW_DL_SRC",
+  "OFPFW_DL_TYPE",
+  "OFPFW_NW_PROTO",
+  "OFPFW_TP_SRC",
+  "OFPFW_TP_DST",
+  "OFPFW_NW_SRC_SHIFT",
+  "OFPFW_NW_SRC_BITS",
+  "OFPFW_NW_SRC_MASK",
+  "OFPFW_NW_SRC_ALL",
+  "OFPFW_NW_DST_SHIFT",
+  "OFPFW_NW_DST_BITS",
+  "OFPFW_NW_DST_MASK",
+  "OFPFW_NW_DST_ALL",
+  "OFPFW_DL_VLAN_PCP",
+  "OFPFW_NW_TOS",
+];
+fm.message.match.dl_dst = "665544332211";
+
 let fmProps = R.clone(fm);
 fmProps.message.hard_timeout = props.hardTimeout;
 fmProps.message.idle_timeout = props.idleTimeout;

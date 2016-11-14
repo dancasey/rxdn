@@ -69,6 +69,7 @@ let fmProps = R.clone(fm);
 fmProps.message.hard_timeout = props.hardTimeout;
 fmProps.message.idle_timeout = props.idleTimeout;
 fmProps.message.priority = props.priority;
+fmProps.message.header.length = 88;
 
 /* tests */
 
@@ -85,7 +86,7 @@ test("Creates the corresponding FlowMod", t => {
     .map(m => t.deepEqual(m, expecting));
 });
 
-test("Adjusts timeouts based on props", t => {
+test.only("Adjusts timeouts based on props", t => {
   t.plan(1);
 
   const expecting: rxdn.OFEvent = {
