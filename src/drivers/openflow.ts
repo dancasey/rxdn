@@ -57,15 +57,26 @@ export function makeOpenFlowDriver(options = defaultOptions) {
         sockets.delete(id);
       });
       socket.on("error", (error: Error) => observer.next({event: OFEventType.Error, id, error}));
-      socket.on("data", (buffer: Buffer) => {
-        // Try to decode the buffer into an OpenFlowMessage
-        try {
-          let messages = OF.decodeMultiple(buffer);
-          for (const message of messages) {
-            observer.next({event: OFEventType.Message, id, message});
-          }
-        } catch (error) {
-          observer.next({event: OFEventType.Error, id, error});
+      let decoder = OF.decodeObservable(Observable.fromEvent(socket, "data"));
+      decoder.subscribe(result => {
+        if (result.type === OF.DecodeType.Error) {
+          observer.next({
+            event: OFEventType.Error,
+            id,
+            error: result.error,
+          });
+        } else if (result.type === OF.DecodeType.Message) {
+          observer.next({
+            event: OFEventType.Message,
+            id,
+            message: result.message,
+          });
+        } else {
+          observer.next({
+            event: OFEventType.Error,
+            id,
+            error: new Error("Unknown decoding error"),
+          });
         }
       });
 
