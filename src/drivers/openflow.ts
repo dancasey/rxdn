@@ -3,9 +3,6 @@ import {Driver, Collection} from "../interfaces";
 import {createServer, Socket, ListenOptions} from "net";
 import {Observable, Observer} from "rxjs";
 
-// import {inspect} from "util";
-// const insp = (obj: any) => inspect(obj, {colors: true, depth: 4});
-
 export enum OFEventType {
   Connection,
   Disconnection,
@@ -62,14 +59,10 @@ export function makeOpenFlowDriver(options = defaultOptions) {
       socket.on("error", (error: Error) => observer.next({event: OFEventType.Error, id, error}));
       socket.on("data", (buffer: Buffer) => {
         // Try to decode the buffer into an OpenFlowMessage
-        let bytesRead = 0;
-        let message: OF.OpenFlowMessage;
         try {
-          // Loop until we get all the messages out of the buffer
-          while (bytesRead < buffer.length) {
-            message = OF.decode(buffer.slice(bytesRead));
+          let messages = OF.decodeMultiple(buffer);
+          for (const message of messages) {
             observer.next({event: OFEventType.Message, id, message});
-            bytesRead += message.message.header.length;
           }
         } catch (error) {
           observer.next({event: OFEventType.Error, id, error});
@@ -97,7 +90,6 @@ export function makeOpenFlowDriver(options = defaultOptions) {
           // Try to encode the message
           try {
             buffer = outgoing.message.encode();
-            // console.log(`openFlowDriver: sending ${outgoing.message.name}: ${insp(buffer)}`);
             // console.log(`openFlowDriver: sending ${outgoing.message.name} to ${outgoing.id}`);
             socket.write(buffer);
           } catch (error) {
