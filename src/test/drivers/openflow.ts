@@ -9,9 +9,6 @@ import {Observable} from "rxjs";
 import {readFileSync} from "fs";
 import {join} from "path";
 
-// import {inspect} from "util";
-// const insp = (obj: any) => inspect(obj, {colors: true, depth: 4});
-
 const identityDriver: rxdn.Driver<any, any> = (sinks) => sinks;
 
 const CLIENT_DELAY = 0; // setTimeout delay for clients
@@ -208,14 +205,15 @@ test.cb("decodes many concatenated PacketIn messages", t => {
       .map(e => t.fail());
     const msg = sources.openflowDriver
       .filter(e => e.event === rxdn.OFEventType.Message)
-      .map((m: {id: string, event: rxdn.OFEventType.Message, message: rxdn.OpenFlowMessage}) => {
-        // console.log(`pi xid ${m.message.message.header.xid}`);
-        t.true(m.message.name === "ofp_packet_in");
-        // if (m.message.message.header.xid % 10 === 0) {
-        //   console.log(insp(m));
-        // }
-        if (m.message.message.header.xid === 0x130) {
-          t.end();
+      .map(m => {
+        if (m.event === rxdn.OFEventType.Error) {
+          t.fail(`Got an error on decode: ${m.error}`);
+          return;
+        } else if (m.event === rxdn.OFEventType.Message) {
+          t.true(m.message.name === "ofp_packet_in");
+          if (m.message.message.header.xid === 0x130) {
+            t.end();
+          }
         }
       });
     const sinks = {
