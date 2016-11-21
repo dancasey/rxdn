@@ -17,7 +17,7 @@ export const Push: OFComponent = sources => {
     .filter(m =>
       m.event === OFEventType.Message &&
       m.message.name === "ofp_hello" &&
-      m.message.message.header.version === of13.OFP_VERSION
+      m.message.message.header.version === of13.OFP_VERSION,
     )
     .map((m: {id: string, event: OFEventType.Message, message: of13.Hello}) => {
       // Build the Action to send flows to the controller

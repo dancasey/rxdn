@@ -9,7 +9,7 @@ import * as R from "ramda";
  * - acl An array of MAC addresses to block in hex string format, e.g. ["aabbccddeeff"]
  */
 export interface AclProps {
-  acl: Array<string>;
+  acl: string[];
 }
 
 export type AclSources = OFCollection & {props: Observable<AclProps>};

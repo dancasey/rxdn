@@ -7,7 +7,7 @@ export enum OFEventType {
   Connection,
   Disconnection,
   Error,
-  Message
+  Message,
 }
 
 export type OFEvent =
