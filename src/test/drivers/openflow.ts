@@ -145,14 +145,14 @@ test.cb("decodes multiple messages from single buffer", t => {
 function encodeClient(t: ContextualCallbackTestContext) {
   let client = net.connect({port: ENCODE_TEST_PORT}, () => {
     client.on("data", (data: Buffer) => {
-      let decoded: rxdn.OpenFlowMessage;
+      let decoded: rxdn.OpenFlowMessage[];
       try {
-        decoded = rxdn.decode(data);
+        decoded = rxdn.decodeMultiple(data);
       } catch (error) {
         t.fail(error);
         return;
       }
-      t.deepEqual(decoded, new rxdn.of13.Hello());
+      t.deepEqual(decoded[0], new rxdn.of13.Hello());
       t.end();
     });
   });
