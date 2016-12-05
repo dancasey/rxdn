@@ -2,6 +2,11 @@
 
 import * as rxdn from "../rxdn";
 
+// cbench emulates 16 switches by deault; increase listener limit to avoid
+// extra error messages being printed (the limit is not enforced; it only warns).
+import {EventEmitter} from "events";
+EventEmitter.defaultMaxListeners = 30;
+
 const simpleFlowMod: rxdn.OFComponent = sources => {
   const flowMods = sources.openflowDriver
     .filter(ev => ev.event === rxdn.OFEventType.Message && ev.message.name === "ofp_packet_in")
