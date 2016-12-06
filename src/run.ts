@@ -38,8 +38,8 @@ function subscribeAll(sinks: Collection, proxies: SubjectCollection): Subscripti
 function makeMain(main: Component, sources: Collection): Component {
   const newMain = (src: Collection) => {
     return Compose([
-      main,
       FlowControl,
+      main,
     ], sources);
   };
   return newMain;
