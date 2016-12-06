@@ -30,32 +30,6 @@ const defaultOptions: ListenOptions = {
   host: "localhost",
 };
 
-class Codec extends Transform {
-  constructor(private id: string, private source: Observer<OFEvent>, private sink: Observable<OFEvent>) {
-    super({objectMode: true});
-    this.sink.filter(ev => ev.id === this.id).subscribe({
-      next: outgoing => {
-        if (outgoing.event === OFEventType.Message) {
-          this.push(outgoing.message);
-        }
-      },
-      error: err => this.emit("error", err),
-      complete: () => this.push(null),
-    });
-  }
-  public _transform(chunk: any, encoding: string, cb: (err?: Error | null, res?: any) => any) {
-    this.source.next({
-      event: OFEventType.Message,
-      id: this.id,
-      message: chunk,
-    });
-    setImmediate(cb);
-  }
-  public _flush(cb: (err?: Error | null, res?: any) => any) {
-    cb();
-  }
-}
-
 /**
  * OpenFlow driver
  * @param {ListenOptions} [options=defaultOptions] Server options for net.Server
@@ -66,10 +40,36 @@ export function makeOpenFlowDriver(options = defaultOptions) {
   const server = createServer();
 
   const openFlowDriver: Driver<OFEvent, OFEvent> = sink => {
+    // Send incoming messages to encoder
+    sink.subscribe({
+      next: msg => {
+        let socketTuple = sockets.get(msg.id);
+        if (!socketTuple) {
+          console.error(`No matching socket found: ${msg.id}`);
+          return;
+        }
+        let {encoder, decoder} = socketTuple;
+        if (msg.event === OFEventType.Message) {
+          let ok = encoder.write(msg.message);
+          if (!ok) {
+            decoder.pause();
+            encoder.once("drain", decoder.resume);
+          }
+        }
+      },
+      error: err => {
+        console.error(`Error from sink, closing: ${err}`);
+        server.close();
+      },
+      complete: () => server.close(),
+    });
+
     // Decode incoming data and send to observer
     return new Observable<OFEvent>((observer: Observer<OFEvent>) => {
       server.listen(options);
       server.on("connection", (socket: Socket) => {
+        const id = `${socket.remoteAddress}:${socket.remotePort}`;
+
         // Make socket pipe into decoder
         const decodeStream = new OF.DecodeStream();
         const decoder = socket.pipe(decodeStream);
@@ -79,26 +79,23 @@ export function makeOpenFlowDriver(options = defaultOptions) {
           setImmediate(() => observer.next({event: OFEventType.Error, id, error})));
 
         // Make encoder pipe into socket
-        const id = `${socket.remoteAddress}:${socket.remotePort}`;
         const encoder = new OF.EncodeStream();
         encoder.pipe(socket);
 
-        // Pipe data
-        const codec = new Codec(id, observer, sink);
-        decoder.pipe(codec).pipe(encoder);
+        // Send messages from decoder into observer
+        decoder.on("data", (message: OF.OpenFlowMessage) =>
+          setImmediate(() => observer.next({event: OFEventType.Message, id, message})));
 
         // Tell the observer about the new connection
         setImmediate(() => observer.next({event: OFEventType.Connection, id}));
 
         // Set up listeners for end, error
-        socket.on("end", () => {
+        decoder.on("end", () => {
           setImmediate(() => observer.next({event: OFEventType.Disconnection, id}));
-          socket.unpipe();
-          encoder.unpipe();
+          socket.unpipe(decoder);
+          encoder.unpipe(socket);
           sockets.delete(id);
         });
-        socket.on("error", (error: Error) =>
-          setImmediate(() => observer.next({event: OFEventType.Error, id, error})));
 
         // Add socket and encoder to `sockets` map
         sockets.set(id, {socket, decoder, encoder});

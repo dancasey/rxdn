@@ -1,6 +1,6 @@
 {
   "name": "@dancasey/rxdn",
-  "version": "0.1.3",
+  "version": "0.1.6",
   "description": "Reactively Defined Networking (rxdn)",
   "main": "dist/rxdn.js",
   "scripts": {
