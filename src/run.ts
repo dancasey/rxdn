@@ -1,5 +1,7 @@
 import {Subscription, ReplaySubject} from "rxjs";
 import {Collection, Component, Drivers} from "./interfaces";
+import {Compose} from "./components/compose";
+import {FlowControl} from "./components/flowcontrol";
 
 interface SubjectCollection {
   [name: string]: ReplaySubject<any>;
@@ -33,10 +35,21 @@ function subscribeAll(sinks: Collection, proxies: SubjectCollection): Subscripti
   return subscription;
 }
 
+function makeMain(main: Component, sources: Collection): Component {
+  const newMain = (src: Collection) => {
+    return Compose([
+      main,
+      FlowControl,
+    ], sources);
+  };
+  return newMain;
+}
+
 export function run(main: Component, drivers: Drivers): Subscription {
   const proxies = makeProxies(drivers);
   const sources = callDrivers(drivers, proxies);
-  const {sinks} = main(sources);
+  const newMain = makeMain(main, sources);
+  const {sinks} = newMain(sources);
   const subscription = subscribeAll(sinks, proxies);
   return subscription;
 }

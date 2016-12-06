@@ -44,12 +44,14 @@ class Codec extends Transform {
     });
   }
   public _transform(chunk: any, encoding: string, cb: (err?: Error | null, res?: any) => any) {
-    this.source.next({
+    let result: OFEvent = {
       event: OFEventType.Message,
       id: this.id,
       message: chunk,
-    });
-    setImmediate(cb);
+    };
+    // Include the callback as a nonenumerable accessor property `ref`
+    Object.defineProperty(result, "cb", { get: () => cb});
+    this.source.next(result);
   }
   public _flush(cb: (err?: Error | null, res?: any) => any) {
     cb();
