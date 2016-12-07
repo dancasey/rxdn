@@ -1,8 +1,7 @@
 import * as OF from "@dancasey/node-openflow";
 import {Driver, Collection} from "../interfaces";
-import {createServer, Socket, ListenOptions} from "net";
+import {createServer, Socket} from "net";
 import {Observable, Observer} from "rxjs";
-import {Transform} from "stream";
 
 export enum OFEventType {
   Connection,
@@ -25,40 +24,128 @@ export interface OFComponent {
   (sources: OFCollection): {sources: OFCollection, sinks: OFCollection};
 }
 
-const defaultOptions: ListenOptions = {
+export interface OFOptions {
+  port?: number;
+  host?: string;
+  debug?: boolean;
+}
+
+const defaultOptions: OFOptions = {
   port: 6653,
   host: "localhost",
+  debug: false,
+};
+
+const decodeBuffer = (id: string, observer: Observer<OFEvent>, buffer: Buffer) => {
+  function decodeEach(buf: Buffer) {
+    // check minimum length
+    if (buf.length < 8) {
+      observer.next({
+        id,
+        event: OFEventType.Error,
+        error: new Error(`decodeEach buffer length ${buf.length}`),
+      });
+      return;
+    }
+    // Read header (xid not needed)
+    let version: number;
+    let type: number;
+    let length: number;
+    version = buf.readUInt8(0);
+    type = buf.readUInt8(1);
+    length = buf.readUInt16BE(2);
+
+    // check length
+    if (buf.length < length) {
+      observer.next({
+        id,
+        event: OFEventType.Error,
+        error: new Error(`decodeEach buffer length ${buf.length} < ${length}`),
+      });
+      return;
+    }
+
+    // check version
+    let messages: any[];
+    if (version === OF.of10.OFP_VERSION) {
+      messages = OF.of10.messagesByIndex;
+    } else if (version === OF.of13.OFP_VERSION) {
+      messages = OF.of13.messagesByIndex;
+    } else {
+      observer.next({
+        id,
+        event: OFEventType.Error,
+        error: new RangeError(`Unsupported OpenFlow version ${version}`),
+      });
+      return;
+    }
+
+    // try decode
+    try {
+      let message = messages[type].decode(buf.slice(0, length));
+      observer.next({
+        id,
+        event: OFEventType.Message,
+        message,
+      });
+    } catch (error) {
+      observer.next({
+        id,
+        event: OFEventType.Error,
+        error: new RangeError(`Unable to decode buffer: ${error}`),
+      });
+    }
+
+    // decode again if there is more
+    if (buf.length > length) {
+      setImmediate(() => decodeEach(buf.slice(length)));
+    }
+
+  }
+  decodeEach(buffer);
 };
 
 /**
  * OpenFlow driver
- * @param {ListenOptions} [options=defaultOptions] Server options for net.Server
+ * @param {OFOptions} [options=defaultOptions] Server options for net.Server
  * @return {Driver<OpenFlow, OpenFlow>} openFlowDriver
  */
 export function makeOpenFlowDriver(options = defaultOptions) {
-  const sockets: Map<string, {socket: Socket, decoder: Transform, encoder: Transform}> = new Map();
+  const sockets: Map<string, Socket> = new Map();
   const server = createServer();
 
   const openFlowDriver: Driver<OFEvent, OFEvent> = sink => {
-    // Send incoming messages to encoder
+    // Send incoming messages to encoder; pause readable side when writable is overwhelmed
     sink.subscribe({
       next: msg => {
-        let socketTuple = sockets.get(msg.id);
-        if (!socketTuple) {
-          console.error(`No matching socket found: ${msg.id}`);
+        let socket = sockets.get(msg.id);
+        if (!socket) {
+          if (options.debug) {
+            console.error(`No matching socket found: ${msg.id}`);
+          }
           return;
         }
-        let {encoder, decoder} = socketTuple;
         if (msg.event === OFEventType.Message) {
-          let ok = encoder.write(msg.message);
+          let buffer: Buffer;
+          try {
+            buffer = msg.message.encode();
+          } catch (error) {
+            if (options.debug) {
+              console.error(`Unable to encode message ${msg.message.name}`);
+            }
+            return;
+          }
+          let ok = socket.write(buffer);
           if (!ok) {
-            decoder.pause();
-            encoder.once("drain", decoder.resume);
+            socket.pause();
+            socket.once("drain", socket.resume);
           }
         }
       },
       error: err => {
-        console.error(`Error from sink, closing: ${err}`);
+        if (options.debug) {
+          console.error(`Error from sink, closing: ${err}`);
+        }
         server.close();
       },
       complete: () => server.close(),
@@ -66,39 +153,26 @@ export function makeOpenFlowDriver(options = defaultOptions) {
 
     // Decode incoming data and send to observer
     return new Observable<OFEvent>((observer: Observer<OFEvent>) => {
-      server.listen(options);
+      server.listen({port: options.port, host: options.host});
       server.on("connection", (socket: Socket) => {
+        // create string id for storing socket in map
         const id = `${socket.remoteAddress}:${socket.remotePort}`;
-
-        // Make socket pipe into decoder
-        const decodeStream = new OF.DecodeStream();
-        const decoder = socket.pipe(decodeStream);
-
-        // Forward errors to observable
-        decoder.on("error", (error: Error) =>
-          setImmediate(() => observer.next({event: OFEventType.Error, id, error})));
-
-        // Make encoder pipe into socket
-        const encoder = new OF.EncodeStream();
-        encoder.pipe(socket);
-
-        // Send messages from decoder into observer
-        decoder.on("data", (message: OF.OpenFlowMessage) =>
-          setImmediate(() => observer.next({event: OFEventType.Message, id, message})));
 
         // Tell the observer about the new connection
         setImmediate(() => observer.next({event: OFEventType.Connection, id}));
 
+        // Decode messages and send to observer
+        socket.on("data", data => setImmediate(() => decodeBuffer(id, observer, data)));
+
         // Set up listeners for end, error
-        decoder.on("end", () => {
+        socket.on("end", () => {
           setImmediate(() => observer.next({event: OFEventType.Disconnection, id}));
-          socket.unpipe(decoder);
-          encoder.unpipe(socket);
           sockets.delete(id);
         });
+        socket.on("error", (error: Error) => setImmediate(() => observer.next({event: OFEventType.Error, id, error})));
 
-        // Add socket and encoder to `sockets` map
-        sockets.set(id, {socket, decoder, encoder});
+        // Add socket to map
+        sockets.set(id, socket);
       });
       server.on("close", () => observer.complete());
       server.on("error", (error: Error) => observer.error(error));
