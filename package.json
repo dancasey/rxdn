@@ -8,7 +8,7 @@
     "prepublish": "tsc"
   },
   "author": "Dan Casey <dc181@icloud.com> (https://github.com/dancasey)",
-  "license": "PDDL-1.0",
+  "license": "LicenseRef-USGov-17USC105 OR MIT",
   "types": "dist/rxdn.d.ts",
   "homepage": "https://github.com/dancasey/rxdn#readme",
   "bugs": {
