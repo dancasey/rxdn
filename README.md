@@ -23,4 +23,4 @@ See the examples directory for simple instantiations of hub and switch behavior:
 - [examples/hub10.ts](src/examples/hub10.ts) OpenFlow 1.0 hub
 - [examples/hub13.ts](src/examples/hub13.ts) OpenFlow 1.3 hub
 - [examples/switch10.ts](src/examples/switch10.ts) OpenFlow 1.0 switch
-- [examples/switch10.ts](src/examples/switch13.ts) OpenFlow 1.3 switch
+- [examples/switch13.ts](src/examples/switch13.ts) OpenFlow 1.3 switch
